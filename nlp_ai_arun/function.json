@@ -6,7 +6,7 @@
       "type": "blobTrigger",
       "direction": "in",
       "path": "excelfiles/NBD/{name}",
-      "connection": "arunakcs_STORAGE"
+      "connection": "DefaultEndpointsProtocol=https;AccountName=arunakcs;AccountKey=nx8T5960W1vcaeHKOD/4HtiCm0/n58VXhtsNAp7LoyDdZX6IdRPsomJsBoOgB72wPd9AHfwwcoFo+AStndZq2Q==;EndpointSuffix=core.windows.net"
     }
     
   ]
