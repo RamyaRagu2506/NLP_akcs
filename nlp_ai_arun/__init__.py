@@ -6,6 +6,7 @@ import re
 from datetime import datetime
 from azure.storage.blob import BlobServiceClient
 import os
+import io
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -38,7 +39,7 @@ def nlp_algo_comparison(file_path, template_path):
         if keyword in ['inward remittance', 'network international']:
         # Filter rows where the keyword pattern matches the 'Narration' column
             keyword_rows = df_of_pdf_input_file[df_of_pdf_input_file['Narration'].str.contains(pattern)]
-        
+
         # Append debit and credit values to the respective lists
             debit_ir.extend(keyword_rows['Debit'].tolist())
             credit_ir.extend(keyword_rows['Credit'].tolist())
@@ -72,13 +73,12 @@ def nlp_algo_comparison(file_path, template_path):
         blob_service_client = BlobServiceClient.from_connection_string(connection_string)
         # Get a reference to the container
         container_client = blob_service_client.get_container_client(container_name)
-        excel_file = "temp_file.xlsx"
-    
-        template_df.to_excel(f"{excel_file}",sheet_name='summary_output')
-    
+        excel_buffer = io.BytesIO()
+        template_df.to_excel(excel_buffer,sheet_name='summary_output')
+        excel_buffer.seek(0)
+        container_client.upload_blob(name=new_filename, data=excel_buffer)
         logging.info("Opening and loading excel to blob storage")
-        with open(excel_file, "rb") as file:
-            container_client.upload_blob(name=new_filename, data=file)
+
         
         logging.info(f"DataFrame uploaded successfully to Azure Blob Storage as '{new_filename}'.")
         
