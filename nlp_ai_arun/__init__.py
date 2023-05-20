@@ -16,7 +16,7 @@ def main(myblob: func.InputStream):
         blob_service_client = BlobServiceClient.from_connection_string(connection_string)
 
         # Get the blob container and blob client
-        container_name = "arunakcs"
+        container_name = "excelfiles"
         container_client = blob_service_client.get_container_client(container_name)
         blob_client = container_client.get_blob_client(myblob.name)
     
