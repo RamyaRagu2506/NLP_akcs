@@ -7,20 +7,6 @@
       "direction": "in",
       "path": "excelfiles/NBD/{name}",
       "connection": "arunakcs_STORAGE"
-    },
-    {
-      "name": "CBDblob",
-      "type": "blobTrigger",
-      "direction": "in",
-      "path": "excelfiles/CBD/{name}",
-      "connection": "arunakcs_STORAGE"
-    },
-    {
-      "name": "CLTRAKblob",
-      "type": "blobTrigger",
-      "direction": "in",
-      "path": "excelfiles/CLT_RAK/{name}",
-      "connection": "arunakcs_STORAGE"
     }
     
   ]
