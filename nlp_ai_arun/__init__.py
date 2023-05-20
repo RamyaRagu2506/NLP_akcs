@@ -2,6 +2,7 @@ import logging
 import pandas as pd
 import azure.functions as func
 from azure.storage.blob import BlobServiceClient
+import io
 
 
 
@@ -19,8 +20,9 @@ def main(myblob: func.InputStream):
         container_name = "excelfiles"
         container_client = blob_service_client.get_container_client(container_name)
         blob_client = container_client.get_blob_client(myblob.name)
-    
-        df = pd.read_excel(myblob.name)
+        
+        excel_data = blob_client.download_blob().readall()
+        df = pd.read_excel(io.BytesIO(excel_data))
         logging.df(df.head())
         
     except Exception as e:
