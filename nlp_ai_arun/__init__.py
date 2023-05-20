@@ -2,22 +2,81 @@ import logging
 import pandas as pd
 import azure.functions as func
 import logging
+import re
+from datetime import datetime
+
 
 logging.basicConfig(level=logging.DEBUG)
 
+def nlp_algo_comparison(file_path, template_path):
+    df_of_pdf_input_file = pd.read_excel(file_path)
+    template_df = pd.read_excel(template_path, sheet_name='Summary_test')
+    
+    logging.info(f"Loading keywords...")
+    
+    # Assuming you have a DataFrame named 'pdf_df' and the keyword list as 'keyword_finance'
+    keyword_finance = ['inward remittance', 'network international', 'sdm deposit']
 
+# Initialize empty lists
+    debit_ir = []
+    credit_ir = []
+    debit_cd = []
+    credit_cd = []
+
+# Convert the 'Narration' column to lowercase for case-insensitive matching
+    df_of_pdf_input_file['Narration'] = df_of_pdf_input_file['Narration'].str.lower()
+
+# Iterate over the keywords
+    for keyword in keyword_finance:
+        
+    # Create a regular expression pattern for the keyword
+        pattern = re.compile(keyword, re.IGNORECASE)
+    
+    # Check if keyword is 'inward remittance' or 'network international'
+        if keyword in ['inward remittance', 'network international']:
+        # Filter rows where the keyword pattern matches the 'Narration' column
+            keyword_rows = df_of_pdf_input_file[df_of_pdf_input_file['Narration'].str.contains(pattern)]
+        
+        # Append debit and credit values to the respective lists
+            debit_ir.extend(keyword_rows['Debit'].tolist())
+            credit_ir.extend(keyword_rows['Credit'].tolist())
+        elif keyword == 'sdm deposit':
+        # Filter rows where the keyword pattern matches the 'Narration' column
+            keyword_rows = df_of_pdf_input_file[df_of_pdf_input_file['Narration'].str.contains(pattern)]
+        
+            
+        # Append debit and credit values to the respective lists
+            debit_cd.extend(keyword_rows['Debit'].tolist())
+            credit_cd.extend(keyword_rows['Credit'].tolist())
+            
+    logging.info("Calculating the debit and credit for EmiratedNBD")
+    total_ir = sum(credit_ir) - sum(debit_ir)
+    total_cd = sum(credit_cd) - sum(debit_cd)
+    
+    # Convert the 'Description' column to lowercase for case-insensitive matching
+    template_df['Description'] = template_df['Description'].str.lower()
+
+# Update values using vectorized operations
+    template_df.loc[template_df['Description'] == 'inward remittance', 'Emirates NBD-Classic Luxury-Main'] = total_ir
+    template_df.loc[template_df['Description'] == 'cash deposited', 'Emirates NBD-Classic Luxury-Main'] = total_cd
+    current_datetime = datetime.now().strftime("%Y%m%d%H%M%S")
+    new_filename = f"NBDEmirates_{current_datetime}.xlsx"
+    # Rename the file
+    template_df.to_excel(f"https://arunakcs.blob.core.windows.net/excelfiles/final_excel/{new_filename}.xlsx",sheet_name='summary_output')
+    
+    
 def main(NBDblob: func.InputStream):
     logging.info(f"Python blob trigger function processed blob \n"
                  f"Name: {NBDblob.name} \n"
                  f"Blob Size: {NBDblob.length} bytes")
     
     try:
-        
         account_name = "https://arunakcs.blob.core.windows.net/"
         excel_complete_path = account_name + NBDblob.name
-        logging.info(excel_complete_path)
-        df = pd.read_excel(excel_complete_path)
-        logging.info(df.head())
+        template_path = "https://arunakcs.blob.core.windows.net/excelfiles/main_template/test_template.xlsx"
+        logging.info(f"Complete file path is  {excel_complete_path}")
+        nlp_algo_comparison(excel_complete_path, template_path)
+        
         
     except Exception as e:
         logging.error(f"Error processing blob: {e}")
