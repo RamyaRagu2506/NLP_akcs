@@ -6,9 +6,9 @@ import azure.functions as func
 
 
 
-def main(NBDblob: func.InputStream, CBDblob: func.InputStream, CLTRAKblob: func.InputStream):
+def main(NBDblob: func.InputStream):
     logging.info(f"Python blob trigger function processed blob \n"
-                 f"Name: {NBDblob.name}. {CBDblob.name}, {CLTRAKblob.name}\n"
+                 f"Name: {NBDblob.name} \n"
                  f"Blob Size: {NBDblob.length} bytes")
     try:
         
