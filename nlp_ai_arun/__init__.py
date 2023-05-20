@@ -4,6 +4,8 @@ import azure.functions as func
 import logging
 import re
 from datetime import datetime
+from azure.storage.blob import BlobServiceClient
+import os
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -56,14 +58,37 @@ def nlp_algo_comparison(file_path, template_path):
     # Convert the 'Description' column to lowercase for case-insensitive matching
     template_df['Description'] = template_df['Description'].str.lower()
 
-# Update values using vectorized operations
+    # Update values using vectorized operations
     template_df.loc[template_df['Description'] == 'inward remittance', 'Emirates NBD-Classic Luxury-Main'] = total_ir
     template_df.loc[template_df['Description'] == 'cash deposited', 'Emirates NBD-Classic Luxury-Main'] = total_cd
     current_datetime = datetime.now().strftime("%Y%m%d%H%M%S")
     new_filename = f"NBDEmirates_{current_datetime}.xlsx"
     # Rename the file
-    template_df.to_excel(f"https://arunakcs.blob.core.windows.net/excelfiles/final_excel/{new_filename}.xlsx",sheet_name='summary_output')
+    try:
+        logging.info("Connecting to storage container")    
+        connection_string = "DefaultEndpointsProtocol=https;AccountName=arunakcs;AccountKey=nx8T5960W1vcaeHKOD/4HtiCm0/n58VXhtsNAp7LoyDdZX6IdRPsomJsBoOgB72wPd9AHfwwcoFo+AStndZq2Q==;EndpointSuffix=core.windows.net"
+        container_name = "excelfiles"
+            # Create a BlobServiceClient using the connection string
+        blob_service_client = BlobServiceClient.from_connection_string(connection_string)
+        # Get a reference to the container
+        container_client = blob_service_client.get_container_client(container_name)
+        excel_file = "temp_file.xlsx"
     
+        template_df.to_excel(f"{excel_file}",sheet_name='summary_output')
+    
+        logging.info("Opening and loading excel to blob storage")
+        with open(excel_file, "rb") as file:
+            container_client.upload_blob(name=new_filename, data=file)
+        
+        logging.info(f"DataFrame uploaded successfully to Azure Blob Storage as '{new_filename}'.")
+        
+
+    except Exception as e:
+        logging.error(f"Error uploading DataFrame to Azure Blob Storage: {str(e)}")
+    finally:
+        # Delete the temporary Excel file
+        os.remove(excel_file)
+
     
 def main(NBDblob: func.InputStream):
     logging.info(f"Python blob trigger function processed blob \n"
