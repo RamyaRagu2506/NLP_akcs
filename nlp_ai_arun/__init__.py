@@ -3,7 +3,9 @@ import pandas as pd
 import azure.functions as func
 # from azure.storage.blob import BlobServiceClient
 # import io
+import logging
 
+logging.basicConfig(level=logging.DEBUG)
 
 
 def main(NBDblob: func.InputStream):
