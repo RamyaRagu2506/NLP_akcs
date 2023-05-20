@@ -1,14 +1,14 @@
 import logging
 import pandas as pd
 import azure.functions as func
-from azure.storage.blob import BlobServiceClient
-import io
+# from azure.storage.blob import BlobServiceClient
+# import io
 
 
 
-def main(NBDblob: func.InputStream, CBDblob: func.InputStream, CLT_RAKblob: func.InputStream):
+def main(NBDblob: func.InputStream, CBDblob: func.InputStream, CLTRAKblob: func.InputStream):
     logging.info(f"Python blob trigger function processed blob \n"
-                 f"Name: {NBDblob.name}. {CBDblob.name}, {CLT_RAKblob.name}\n"
+                 f"Name: {NBDblob.name}. {CBDblob.name}, {CLTRAKblob.name}\n"
                  f"Blob Size: {NBDblob.length} bytes")
     try:
         
