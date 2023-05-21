@@ -63,7 +63,7 @@ def nlp_algo_comparison(file_path, template_path):
     template_df.loc[template_df['Description'] == 'inward remittance', 'Emirates NBD-Classic Luxury-Main'] = total_ir
     template_df.loc[template_df['Description'] == 'cash deposited', 'Emirates NBD-Classic Luxury-Main'] = total_cd
     current_datetime = datetime.now().strftime("%Y%m%d%H%M%S")
-    new_filename = f"NBDEmirates_{current_datetime}.xlsx"
+    new_filename = f"final_excel/NBDEmirates_{current_datetime}.xlsx"
     # Rename the file
     try:
         logging.info("Connecting to storage container")    
