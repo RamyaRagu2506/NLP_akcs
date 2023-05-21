@@ -63,7 +63,7 @@ def nlp_algo_comparison(file_path, template_path):
     template_df.loc[template_df['Description'] == 'inward remittance', 'Emirates NBD-Classic Luxury-Main'] = total_ir
     template_df.loc[template_df['Description'] == 'cash deposited', 'Emirates NBD-Classic Luxury-Main'] = total_cd
     current_datetime = datetime.now().strftime("%Y%m%d%H%M%S")
-    new_filename = f"final_excel/NBDEmirates_{current_datetime}.xlsx"
+    new_filename = f"final_excel/NBD/NBDEmirates_{current_datetime}.xlsx"
     # Rename the file
     try:
         logging.info("Connecting to storage container")    
@@ -87,7 +87,7 @@ def nlp_algo_comparison(file_path, template_path):
         logging.error(f"Error uploading DataFrame to Azure Blob Storage: {str(e)}")
     finally:
         # Delete the temporary Excel file
-        os.remove(excel_file)
+        logging.info(f"Done and dusted!")
 
     
 def main(NBDblob: func.InputStream):
