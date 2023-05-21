@@ -5,21 +5,24 @@ import logging
 import re
 from datetime import datetime
 from azure.storage.blob import BlobServiceClient
-import os
 import io
 
 
 logging.basicConfig(level=logging.DEBUG)
 
 def nlp_algo_comparison(file_path, template_path):
+    
+    logging.info(f"File path loaded into the function {file_path}, {template_path}")
     df_of_pdf_input_file = pd.read_excel(file_path)
     template_df = pd.read_excel(template_path, sheet_name='Summary_test')
     
-    logging.info(f"Loading keywords...")
+    logging.info(f"Loaded data to Dataframe, to check size: {template_df.size}, {df_of_pdf_input_file.size}")
     
     # Assuming you have a DataFrame named 'pdf_df' and the keyword list as 'keyword_finance'
     keyword_finance = ['inward remittance', 'network international', 'sdm deposit']
 
+    logging.info(f"Keywords loaded : {keyword_finance}")
+    
 # Initialize empty lists
     debit_ir = []
     credit_ir = []
@@ -27,6 +30,8 @@ def nlp_algo_comparison(file_path, template_path):
     credit_cd = []
 
 # Convert the 'Narration' column to lowercase for case-insensitive matching
+
+    logging.info(f"Converting the Narration column to lower case")
     df_of_pdf_input_file['Narration'] = df_of_pdf_input_file['Narration'].str.lower()
 
 # Iterate over the keywords
@@ -34,7 +39,8 @@ def nlp_algo_comparison(file_path, template_path):
         
     # Create a regular expression pattern for the keyword
         pattern = re.compile(keyword, re.IGNORECASE)
-    
+        logging.info(f"Pattern created for regular expression {pattern}")
+        
     # Check if keyword is 'inward remittance' or 'network international'
         if keyword in ['inward remittance', 'network international']:
         # Filter rows where the keyword pattern matches the 'Narration' column
