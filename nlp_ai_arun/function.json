@@ -6,7 +6,8 @@
       "type": "blobTrigger",
       "direction": "in",
       "path": "excelfiles/{name}",
-      "connection": "arunakcs_STORAGE"
+      "connection": "arunakcs_STORAGE",
+      "metadata": "true"
     }
     
   ]
