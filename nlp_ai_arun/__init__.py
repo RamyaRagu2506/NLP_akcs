@@ -4,6 +4,7 @@ import azure.functions as func
 import logging
 import re
 import datetime
+from datetime import datetime as second_datetime
 from azure.storage.blob import BlobServiceClient
 import io
 
@@ -74,7 +75,7 @@ def nlp_algo_comparison(file_path, template_path):
     # Update values using vectorized operations
     template_df.loc[template_df['Description'] == 'inward remittance', 'Emirates NBD-Classic Luxury-Main'] = total_ir
     template_df.loc[template_df['Description'] == 'cash deposited', 'Emirates NBD-Classic Luxury-Main'] = total_cd
-    current_datetime = datetime.now().strftime("%Y%m%d%H%M%S")
+    current_datetime = second_datetime.now().strftime("%Y%m%d%H%M%S")
     new_filename = f"final_excel/NBD/NBDEmirates_{current_datetime}.xlsx"
     # Rename the file
     try:
