@@ -14,16 +14,16 @@ logging.basicConfig(level=logging.DEBUG)
 def nlp_algo_comparison(file_path, template_path):
     
     logging.info(f"Initializing yesterday date")
-    current_date = datetime.date.today()
-    yesterday_date = current_date - datetime.timedelta(days=1)
+    #current_date = datetime.date.today()
+    #yesterday_date = current_date - datetime.timedelta(days=1)
     
     logging.info(f"File path loaded into the function {file_path}, {template_path}")
     df_of_pdf_input_file = pd.read_excel(file_path)
     template_df = pd.read_excel(template_path, sheet_name='Summary_test')
     
     logging.info(f"Loaded data to Dataframe, to check size: {template_df.size}, {df_of_pdf_input_file.size}")
-    df_of_pdf_input_file['TransactionDate'] = pd.to_datetime(df_of_pdf_input_file['TransactionDate'])
-    df_of_pdf_input_file_based_on_date = df_of_pdf_input_file[df_of_pdf_input_file['TransactionDate'].dt.date==yesterday_date]
+    #df_of_pdf_input_file['TransactionDate'] = pd.to_datetime(df_of_pdf_input_file['TransactionDate'])
+    #df_of_pdf_input_file_based_on_date = df_of_pdf_input_file[df_of_pdf_input_file['TransactionDate'].dt.date==yesterday_date]
     
     # Assuming you have a DataFrame named 'pdf_df' and the keyword list as 'keyword_finance'
     keyword_finance = ['inward remittance', 'network international', 'sdm deposit']
@@ -39,7 +39,7 @@ def nlp_algo_comparison(file_path, template_path):
 # Convert the 'Narration' column to lowercase for case-insensitive matching
     
     logging.info(f"Converting the Narration column to lower case")
-    df_of_pdf_input_file_based_on_date['Narration'] = df_of_pdf_input_file_based_on_date['Narration'].str.lower()
+    df_of_pdf_input_file['Narration'] = df_of_pdf_input_file['Narration'].str.lower()
 
 # Iterate over the keywords
     for keyword in keyword_finance:
@@ -51,14 +51,14 @@ def nlp_algo_comparison(file_path, template_path):
     # Check if keyword is 'inward remittance' or 'network international'
         if keyword in ['inward remittance', 'network international']:
         # Filter rows where the keyword pattern matches the 'Narration' column
-            keyword_rows = df_of_pdf_input_file_based_on_date[df_of_pdf_input_file_based_on_date['Narration'].str.contains(pattern)]
+            keyword_rows = df_of_pdf_input_file[df_of_pdf_input_file['Narration'].str.contains(pattern)]
 
         # Append debit and credit values to the respective lists
             debit_ir.extend(keyword_rows['Debit'].tolist())
             credit_ir.extend(keyword_rows['Credit'].tolist())
         elif keyword == 'sdm deposit':
         # Filter rows where the keyword pattern matches the 'Narration' column
-            keyword_rows = df_of_pdf_input_file_based_on_date[df_of_pdf_input_file_based_on_date['Narration'].str.contains(pattern)]
+            keyword_rows = df_of_pdf_input_file[df_of_pdf_input_file['Narration'].str.contains(pattern)]
         
             
         # Append debit and credit values to the respective lists
@@ -108,6 +108,7 @@ def main(NBDblob: func.InputStream):
                  f"Name: {NBDblob.name} \n"
                  f"Blob Size: {NBDblob.length} bytes \n"
                  f"Blob modified Date: {NBDblob.metadata.get('last_modified')}" )
+    
     try:
         account_name = "https://arunakcs.blob.core.windows.net/"
         excel_complete_path = account_name + NBDblob.name
