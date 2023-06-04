@@ -103,14 +103,11 @@ def nlp_algo_comparison(file_path, template_path):
         logging.info(f"Done and dusted!")
 
     
-def main(NBDblob: func.InputStream, CBDblob: func.InputStream, CLTRAKBlob: func.InputStream):
+def main(NBDblob: func.InputStream):
     logging.info(f"Python blob trigger function processed blob \n"
                  f"Name: {NBDblob.name} \n"
                  f"Blob Size: {NBDblob.length} bytes \n"
-                 f"Blob modified Date: {NBDblob.metadata.get('last_modified')}" )
-    
-    logging.info(f"cltrak: {CLTRAKBlob.name}, cbd: {CBDblob.name}")
-    
+                 f"Blob modified Date: {NBDblob.metadata.get('last_modified')}" )    
     try:
         account_name = "https://arunakcs.blob.core.windows.net/"
         excel_complete_path = account_name + NBDblob.name

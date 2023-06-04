@@ -8,24 +8,7 @@
       "path": "excelfiles/{name}",
       "connection": "arunakcs_STORAGE",
       "metadata": "true"
-    },
-    {
-      "name": "CBDblob",
-      "type": "blobTrigger",
-      "direction": "in",
-      "path": "excelfiles/{name}",
-      "connection": "arunakcs_STORAGE",
-      "metadata": "true"
-    },
-    {
-      "name": "CLTRAKBlob",
-      "type": "blobTrigger",
-      "direction": "in",
-      "path": "excelfiles/{name}",
-      "connection": "arunakcs_STORAGE",
-      "metadata": "true"
     }
-    
     
   ]
 }
