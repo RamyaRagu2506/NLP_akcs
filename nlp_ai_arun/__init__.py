@@ -105,8 +105,6 @@ def nlp_algo_comparison(file_path, template_path):
     
 def main(NBDblob: func.InputStream):
     
-    databricks_token = "dapiae782ef04a92a91e594ffc416bbb9018"
-    databricks_workspace = "https://adb-6575288723130734.14.azuredatabricks.net"
 
     def trigger_databricks_job_run():
 
@@ -136,7 +134,8 @@ def main(NBDblob: func.InputStream):
             logging.info("Databricks job run triggered.")
         else:
         # Handle the error case
-            logging.info(f"Failed to trigger Databricks job run. Status code: {response.status_code}")
+        
+            logging.info(f"Failed to trigger Databricks job run. Status code: {response.status_code}: {response.content}")
 
     trigger_databricks_job_run()
     try:
