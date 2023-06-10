@@ -7,7 +7,7 @@ import datetime
 from datetime import datetime as second_datetime
 from azure.storage.blob import BlobServiceClient
 import io
-
+import requests
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -105,26 +105,39 @@ def nlp_algo_comparison(file_path, template_path):
     
 def main(NBDblob: func.InputStream):
     
-            # Get the connection string and container name from the environment variables
-    connection_string = "DefaultEndpointsProtocol=https;AccountName=arunakcs;AccountKey=nx8T5960W1vcaeHKOD/4HtiCm0/n58VXhtsNAp7LoyDdZX6IdRPsomJsBoOgB72wPd9AHfwwcoFo+AStndZq2Q==;EndpointSuffix=core.windows.net"
-    container_name = "excelfiles"
-        
-        # Create the BlobServiceClient object
-    blob_service_client = BlobServiceClient.from_connection_string(connection_string)
-        
-        # Get the blob client
-    blob_client = blob_service_client.get_blob_client(container=container_name, blob=NBDblob.name)
-        
-        # Get the blob properties
-    blob_properties = blob_client.get_blob_properties()
-        
-        # Retrieve the last modified date
-    last_modified = blob_properties.last_modified
-    logging.info(last_modified)
+    databricks_token = "dapiae782ef04a92a91e594ffc416bbb9018"
+    databricks_workspace = "https://adb-6575288723130734.14.azuredatabricks.net"
+
+    # Construct the API endpoint to run the notebook
+    notebook_path = "/Shared/Dev-Text-NLP-Model"
+    run_endpoint = f"{databricks_workspace}/api/2.0/jobs/runs/submit"
+
+    # Prepare the request headers and body
+    headers = {
+        "Authorization": f"Bearer {databricks_token}",
+        "Content-Type": "application/json"
+    }
+    data = {
+        "notebook_task": {
+            "notebook_path": notebook_path
+        }
+    }
+
+    print(data)
+    
+    # Send the request to run the notebook
+    response = requests.post(run_endpoint, headers=headers, json=data)
+
+    if response.status_code == 200:
+        # Notebook run successfully submitted
+        print("Notebook execution triggered.")
+    else:
+        # Handle the error case
+        print(f"Failed to run the notebook. Status code: {response.status_code}")
+
     logging.info(f"Python blob trigger function processed blob \n"
                  f"Name: {NBDblob.name} \n"
-                 f"Blob Size: {NBDblob.length} bytes \n"
-                 f"Blob modified Date: {last_modified}")
+                 f"Blob Size: {NBDblob.length} bytes")
     try:
         account_name = "https://arunakcs.blob.core.windows.net/"
         excel_complete_path = account_name + NBDblob.name
