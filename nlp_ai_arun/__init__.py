@@ -123,17 +123,17 @@ def main(NBDblob: func.InputStream):
         }
     }
 
-    print(data)
+    logging.info(data)
     
     # Send the request to run the notebook
     response = requests.post(run_endpoint, headers=headers, json=data)
 
     if response.status_code == 200:
         # Notebook run successfully submitted
-        print("Notebook execution triggered.")
+        logging.info("Notebook execution triggered.")
     else:
         # Handle the error case
-        print(f"Failed to run the notebook. Status code: {response.status_code}")
+        logging.info(f"Failed to run the notebook. Status code: {response.status_code}")
 
     logging.info(f"Python blob trigger function processed blob \n"
                  f"Name: {NBDblob.name} \n"
