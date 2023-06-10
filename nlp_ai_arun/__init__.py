@@ -108,36 +108,37 @@ def main(NBDblob: func.InputStream):
     databricks_token = "dapiae782ef04a92a91e594ffc416bbb9018"
     databricks_workspace = "https://adb-6575288723130734.14.azuredatabricks.net"
 
-    # Construct the API endpoint to run the notebook
-    notebook_path = "/Shared/Dev-Text-NLP-Model"
-    run_endpoint = f"{databricks_workspace}/api/2.0/jobs/runs/submit"
+    def trigger_databricks_job_run():
+
+    # Databricks API endpoint for job runs
+        api_endpoint = "https://adb-6575288723130734.14.azuredatabricks.net/api/2.0/jobs/runs/submit"
+
+    # Databricks access token
+        databricks_token = "dapiae782ef04a92a91e594ffc416bbb9018"
+
+    # Job ID of the Databricks job to trigger
+        job_id = 874003694673073
 
     # Prepare the request headers and body
-    headers = {
+        headers = {
         "Authorization": f"Bearer {databricks_token}",
         "Content-Type": "application/json"
-    }
-    data = {
-        "notebook_task": {
-            "notebook_path": notebook_path
         }
-    }
+        data = {
+        "job_id": job_id
+        }
 
-    logging.info(data)
-    
-    # Send the request to run the notebook
-    response = requests.post(run_endpoint, headers=headers, json=data)
+    # Send the request to trigger the job run
+        response = requests.post(api_endpoint, headers=headers, json=data)
 
-    if response.status_code == 200:
-        # Notebook run successfully submitted
-        logging.info("Notebook execution triggered.")
-    else:
+        if response.status_code == 200:
+        # Job run successfully triggered
+            logging.info("Databricks job run triggered.")
+        else:
         # Handle the error case
-        logging.info(f"Failed to run the notebook. Status code: {response.status_code}")
+            logging.info(f"Failed to trigger Databricks job run. Status code: {response.status_code}")
 
-    logging.info(f"Python blob trigger function processed blob \n"
-                 f"Name: {NBDblob.name} \n"
-                 f"Blob Size: {NBDblob.length} bytes")
+    trigger_databricks_job_run()
     try:
         account_name = "https://arunakcs.blob.core.windows.net/"
         excel_complete_path = account_name + NBDblob.name
