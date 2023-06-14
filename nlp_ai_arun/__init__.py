@@ -9,9 +9,10 @@ from azure.storage.blob import BlobServiceClient
 import io
 import requests
 
-logging.basicConfig(level=logging.DEBUG)
     
-def main(NBDblob: func.InputStream):
+def main(myblob: func.InputStream):
     
-    logging.info(f"Checking if the trigger works{NBDblob.name}")    
+    logging.info(f"Blob trigger function processed blob \n"
+                 f"Name: {myblob.name}\n"
+                 f"Blob Size: {myblob.length} bytes")  
     
