@@ -5,7 +5,7 @@
       "name": "NBDblob",
       "type": "blobTrigger",
       "direction": "in",
-      "path": "excelfiles/{name}",
+      "path": "functionapp-pdf/{name}",
       "connection": "arunakcs_STORAGE",
       "metadata": "true"
     }

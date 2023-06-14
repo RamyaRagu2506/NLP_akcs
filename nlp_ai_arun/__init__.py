@@ -105,46 +105,13 @@ def nlp_algo_comparison(file_path, template_path):
     
 def main(NBDblob: func.InputStream):
     
-
-    def trigger_databricks_job_run():
-
-    # Databricks API endpoint for job runs
-        api_endpoint = "https://adb-6575288723130734.14.azuredatabricks.net/api/2.0/jobs/runs/submit"
-
-    # Databricks access token
-        databricks_token = "dapiae782ef04a92a91e594ffc416bbb9018"
-
-    # Job ID of the Databricks job to trigger
-        job_id = 874003694673073
-
-    # Prepare the request headers and body
-        headers = {
-        "Authorization": f"Bearer {databricks_token}",
-        "Content-Type": "application/json"
-        }
-        data = {
-        "job_id": job_id
-        }
-
-    # Send the request to trigger the job run
-        response = requests.post(api_endpoint, headers=headers, json=data)
-
-        if response.status_code == 200:
-        # Job run successfully triggered
-            logging.info("Databricks job run triggered.")
-        else:
-        # Handle the error case
-        
-            logging.info(f"Failed to trigger Databricks job run. Status code: {response.status_code}: {response.content}")
-
-    trigger_databricks_job_run()
+    
     try:
         account_name = "https://arunakcs.blob.core.windows.net/"
         excel_complete_path = account_name + NBDblob.name
         template_path = "https://arunakcs.blob.core.windows.net/excelfiles/main_template/test_template.xlsx"
         logging.info(f"Complete file path is  {excel_complete_path}")
-        nlp_algo_comparison(excel_complete_path, template_path)
-        
+        nlp_algo_comparison(excel_complete_path, template_path)   
         
     except Exception as e:
         logging.error(f"Error processing blob: {e}")
