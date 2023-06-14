@@ -7,3 +7,4 @@ pandas==1.5.3
 azure-storage-blob
 openpyxl
 requests
+pyodbc
