@@ -13,5 +13,5 @@ logging.basicConfig(level=logging.DEBUG)
     
 def main(NBDblob: func.InputStream):
     
-    logging.info(NBDblob.name,"Checking if the trigger works")    
+    logging.info(f"Checking if the trigger works{NBDblob.name}")    
     
