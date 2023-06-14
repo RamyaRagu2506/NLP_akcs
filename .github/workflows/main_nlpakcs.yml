@@ -65,6 +65,6 @@ jobs:
           app-name: 'nlpakcs'
           slot-name: 'Production'
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_7E76CDEFEB074159A7EEEB31F04175E0 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_2E6421083A7C4DAEAA27A4BC5FAC10DC }}
           scm-do-build-during-deployment: true
-          enable-oryx-build: true 
+          enable-oryx-build: true
