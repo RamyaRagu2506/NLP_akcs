@@ -105,15 +105,5 @@ def nlp_algo_comparison(file_path, template_path):
     
 def main(NBDblob: func.InputStream):
     
-    
-    try:
-        account_name = "https://arunakcs.blob.core.windows.net/"
-        excel_complete_path = account_name + NBDblob.name
-        template_path = "https://arunakcs.blob.core.windows.net/excelfiles/main_template/test_template.xlsx"
-        logging.info(f"Complete file path is  {excel_complete_path}")
-        nlp_algo_comparison(excel_complete_path, template_path)   
-        
-    except Exception as e:
-        logging.error(f"Error processing blob: {e}")
-    
+    logging.info(NBDblob.name,"Checking if the trigger works")    
     
