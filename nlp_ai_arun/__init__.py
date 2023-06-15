@@ -6,7 +6,7 @@ from azure.storage.blob import BlobServiceClient, ContentSettings
 import os
 import pyodbc
 import re
-import datetime
+from datetime import datetime
 from joblib import dump, load
 from sklearn.feature_extraction.text import TfidfVectorizer
 
@@ -166,9 +166,10 @@ def main(myblob: func.InputStream):
         pdf_based_file_preprocessed_data['Prediction'] = predictions
         populate_report_template = populate_final_report(report_template, pdf_based_file_preprocessed_data, myblob.name)
         
-        connection_string = "your_connection_string"
-        container_name = "your_container_name"
-        file_name = "your_file_name"
+        now_date = datetime.now()
+        connection_string = "DefaultEndpointsProtocol=https;AccountName=arunakcs;AccountKey=nx8T5960W1vcaeHKOD/4HtiCm0/n58VXhtsNAp7LoyDdZX6IdRPsomJsBoOgB72wPd9AHfwwcoFo+AStndZq2Q==;EndpointSuffix=core.windows.net"
+        container_name = "outputreport"
+        file_name = f"output_report_{now_date}"
         
         save_dataframe_to_blob(populate_final_report,connection_string, container_name, file_name)
 
