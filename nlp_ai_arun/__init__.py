@@ -138,8 +138,8 @@ def main(myblob: func.InputStream):
     df_reference = pd.read_excel(template_file_path, sheet_name="term_references")
     logging.info(df_template.columns)
     
-    model_path = "AkcsNlpCustommodel.pkl"
-    vectorizer_path = "vectorizer.pkl"
+    model_path = "https://asdsandassociates.sharepoint.com/:u:/s/AIProject/EU5AbNR6OI1GgYqeAAcFw5wBuv42N_mcTG5PapwFzVWxDg?e=63bc1I"
+    vectorizer_path = "https://asdsandassociates.sharepoint.com/:u:/s/AIProject/EZ6mxwIESiJLlGCWPB12dNUB3IPFqpA0eVeqhijsUCyMNQ?e=H3RhgT"
     server = "akcserver.database.windows.net"
     database = "dbarunsql"
     username = "Arun"
