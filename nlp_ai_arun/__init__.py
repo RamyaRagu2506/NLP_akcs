@@ -31,7 +31,7 @@ def read_user_input_data(input_file, df_input):
     
     elif 'CLT-ADCB' in input_file:
         clt_adcb_df = df_input[df_input['DomainName']=='CLT - ADCB']
-        return cbd_df
+        return clt_adcb_df
     
     elif 'CBD-Bank' in input_file:
         cbd_df = df_input[df_input['DomainName']=='CBD Bank']
