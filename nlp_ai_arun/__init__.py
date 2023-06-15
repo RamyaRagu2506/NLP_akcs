@@ -31,8 +31,8 @@ def read_user_input_data(input_file, df_input):
         return clt_rak_df
     
     elif 'CLT-ADCB' in input_file:
-        cbd_df = df_input[df_input['DomainName']=='CLT - ADCB']
-        return cbd_df
+        clt_adcb_df = df_input[df_input['DomainName']=='CLT - ADCB']
+        return clt_adcb_df
     
     elif 'CBD-Bank' in input_file:
         cbd_df = df_input[df_input['DomainName']=='CBD Bank']
@@ -45,14 +45,15 @@ def read_user_input_data(input_file, df_input):
     elif 'OLT-Emirates-Islamic-Bank' in input_file:
         cbd_df = df_input[df_input['DomainName']=='OLT - Emirates Islamic Bank']
         return cbd_df
+
     
     elif 'Emirates-NBD-Classic-Passenger' in input_file:
-        cbd_df = df_input[df_input['DomainName']=='Emirates NBD-Classic Passenger']
-        return cbd_df
+        emirates_nbd_classic_passenger_df= df_input[df_input['DomainName']=='Emirates NBD-Classic Passenger']
+        return emirates_nbd_classic_passenger_df
     
     elif 'ENBD-Classic-Riders' in input_file:
-        cbd_df = df_input[df_input['DomainName']=='ENBD - Classic Riders']
-        return cbd_df
+        enbd_classic_riders_df = df_input[df_input['DomainName']=='ENBD - Classic Riders']
+        return enbd_classic_riders_df
     
     else: 
         print(f'{input_file} Does not exist.')
@@ -102,7 +103,7 @@ def fetch_data_from_sql(server, database, username, password, table_name):
     return df
 
 def populate_final_report(report_template, nlp_classified_df, input_file_path):
-    if 'NBD' in input_file_path:
+    if 'Emirates-NBD-Classic-Luxury-Main' in input_file_path:
         
         for description in report_template['Description']:
             filtered_df = nlp_classified_df[nlp_classified_df['Prediction'] == description]
@@ -112,7 +113,7 @@ def populate_final_report(report_template, nlp_classified_df, input_file_path):
             report_template.loc[report_template['Description'] == description, 'Emirates NBD-Classic Luxury-Main'] = total_sum
         report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'Emirates NBD-Classic Luxury-Main'] = report_template['Emirates NBD-Classic Luxury-Main'][1:12].sum()
         
-    elif 'CBD' in input_file_path:
+    elif 'CBD-Bank' in input_file_path:
         
         for description in report_template['Description']:
             filtered_df = nlp_classified_df[nlp_classified_df['Prediction'] == description]
@@ -122,17 +123,64 @@ def populate_final_report(report_template, nlp_classified_df, input_file_path):
             report_template.loc[report_template['Description'] == description, 'CBD Bank'] = total_sum
         report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'CBD Bank'] = report_template['CBD Bank'][1:12].sum()
 
-    elif 'CLTRAK' in input_file_path:
+    elif 'Rak-Bank-Classic-Luxury' in input_file_path:
         
         for description in report_template['Description']:
             filtered_df = nlp_classified_df[nlp_classified_df['Prediction'] == description]
             debit_sum = filtered_df['Debit'].sum()
             credit_sum = filtered_df['Credit'].sum()
             total_sum = credit_sum + (-debit_sum)
-            report_template.loc[report_template['Description'] == description, 'Emirates NBD-Classic Luxury-Main'] = total_sum
-        report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'Emirates NBD-Classic Luxury-Main'] = report_template['Emirates NBD-Classic Luxury-Main'][1:12].sum()
+            report_template.loc[report_template['Description'] == description, 'Rak Bank-Classic Luxury'] = total_sum
+        report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'Rak Bank-Classic Luxury'] = report_template['Rak Bank-Classic Luxury'][1:12].sum()
 
+    elif 'CLT-ADCB' in input_file_path:
         
+        for description in report_template['Description']:
+            filtered_df = nlp_classified_df[nlp_classified_df['Prediction'] == description]
+            debit_sum = filtered_df['Debit'].sum()
+            credit_sum = filtered_df['Credit'].sum()
+            total_sum = credit_sum + (-debit_sum)
+            report_template.loc[report_template['Description'] == description, 'CLT-ADCB'] = total_sum
+        report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'CLT-ADCB'] = report_template['CLT-ADCB'][1:12].sum()
+
+    elif 'EIB-Loan account' in input_file_path:
+        
+        for description in report_template['Description']:
+            filtered_df = nlp_classified_df[nlp_classified_df['Prediction'] == description]
+            debit_sum = filtered_df['Debit'].sum()
+            credit_sum = filtered_df['Credit'].sum()
+            total_sum = credit_sum + (-debit_sum)
+            report_template.loc[report_template['Description'] == description, 'EIB-Loan account'] = total_sum
+        report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'EIB-Loan account'] = report_template['EIB-Loan account'][1:12].sum()
+
+    elif 'OLT - Emirates Islamic Bank' in input_file_path:
+        
+        for description in report_template['Description']:
+            filtered_df = nlp_classified_df[nlp_classified_df['Prediction'] == description]
+            debit_sum = filtered_df['Debit'].sum()
+            credit_sum = filtered_df['Credit'].sum()
+            total_sum = credit_sum + (-debit_sum)
+            report_template.loc[report_template['Description'] == description, 'OLT - Emirates Islamic Bank'] = total_sum
+        report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'OLT - Emirates Islamic Bank'] = report_template['OLT - Emirates Islamic Bank'][1:12].sum()
+
+    elif 'Emirates-NBD-Classic-Passenger' in input_file_path:
+        for description in report_template['Description']:
+            filtered_df = nlp_classified_df[nlp_classified_df['Prediction'] == description]
+            debit_sum = filtered_df['Debit'].sum()
+            credit_sum = filtered_df['Credit'].sum()
+            total_sum = credit_sum + (-debit_sum)
+            report_template.loc[report_template['Description'] == description, 'Emirates-NBD-Classic-Passenger'] = total_sum
+        report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'Emirates-NBD-Classic-Passenger'] = report_template['Emirates-NBD-Classic-Passenger'][1:12].sum()
+
+    elif 'ENBD - Classic Riders' in input_file_path:
+        for description in report_template['Description']:
+            filtered_df = nlp_classified_df[nlp_classified_df['Prediction'] == description]
+            debit_sum = filtered_df['Debit'].sum()
+            credit_sum = filtered_df['Credit'].sum()
+            total_sum = credit_sum + (-debit_sum)
+            report_template.loc[report_template['Description'] == description, 'OENBD - Classic Riders'] = total_sum
+        report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'ENBD - Classic Riders'] = report_template['ENBD - Classic Riders'][1:12].sum()
+
         return report_template
 
 
@@ -161,10 +209,10 @@ def main(myblob: func.InputStream):
     df_template = pd.read_excel(template_file_path)
     df_reference = pd.read_excel(template_file_path, sheet_name="term_references")
     logging.info(df_template.columns)
-    
+
     server = "akcserver.database.windows.net"
     database = "dbarunsql"
-    username = "Arun"
+    username = "Arun" 
     password = "Asds@2022"
     table_name = "TransactionDetails"
     
