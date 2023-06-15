@@ -9,6 +9,7 @@ import re
 from datetime import datetime
 from joblib import dump, load
 from sklearn.feature_extraction.text import TfidfVectorizer
+import pickle 
 
 def read_user_input_data(input_file, df_input):
     current_datetime = datetime.now()
