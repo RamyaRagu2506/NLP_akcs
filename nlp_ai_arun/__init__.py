@@ -214,7 +214,7 @@ def main(myblob: func.InputStream):
     vectorizer_path = container_client.get_blob_client("vectorizer.pkl")
     server = "akcserver.database.windows.net"
     database = "dbarunsql"
-    username = "Arun"
+    username = "Arun" 
     password = "Asds@2022"
     table_name = "TransactionDetails"
 
