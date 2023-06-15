@@ -9,6 +9,7 @@ import re
 from datetime import datetime
 from joblib import dump, load
 from sklearn.feature_extraction.text import TfidfVectorizer
+import pickle 
 
 def read_user_input_data(input_file, df_input):
     current_datetime = datetime.now()
@@ -207,12 +208,13 @@ def main(myblob: func.InputStream):
     df_template = pd.read_excel(template_file_path)
     df_reference = pd.read_excel(template_file_path, sheet_name="term_references")
     logging.info(df_template.columns)
-    
-    model_path = "https://asdsandassociates.sharepoint.com/:u:/s/AIProject/EU5AbNR6OI1GgYqeAAcFw5wBuv42N_mcTG5PapwFzVWxDg?e=63bc1I"
-    vectorizer_path = "https://asdsandassociates.sharepoint.com/:u:/s/AIProject/EZ6mxwIESiJLlGCWPB12dNUB3IPFqpA0eVeqhijsUCyMNQ?e=H3RhgT"
+    blob_service_client = BlobServiceClient.from_connection_string(connection_string)
+    container_client = blob_service_client.get_container_client("akcsaiamodel")
+    model_path = container_client.get_blob_client("AkcsNlpCustommodel.pkl")
+    vectorizer_path = container_client.get_blob_client("vectorizer.pkl")
     server = "akcserver.database.windows.net"
     database = "dbarunsql"
-    username = "Arun"
+    username = "Arun" 
     password = "Asds@2022"
     table_name = "TransactionDetails"
 
