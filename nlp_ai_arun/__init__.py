@@ -9,7 +9,7 @@ import re
 from datetime import datetime
 from joblib import dump, load
 from sklearn.feature_extraction.text import TfidfVectorizer
-import pickle 
+import pickle
 
 def read_user_input_data(input_file, df_input):
     current_datetime = datetime.now()
@@ -38,13 +38,14 @@ def read_user_input_data(input_file, df_input):
         cbd_df = df_input[df_input['DomainName']=='CBD Bank']
         return cbd_df
     
-    elif 'EIB-Loan account' in input_file:
-        eib_loan_account_df = df_input[df_input['DomainName']=='EIB - Loan account']
-        return eib_loan_account_df
+    elif 'EIB-Loan-account' in input_file:
+        cbd_df = df_input[df_input['DomainName']=='EIB - Loan account']
+        return cbd_df
     
-    elif 'OLT-Emirates Islamic Bank' in input_file:
-        olt_emirates_islamic_bank = df_input[df_input['DomainName']=='OLT - Emirates Islamic Bank']
-        return olt_emirates_islamic_bank
+    elif 'OLT-Emirates-Islamic-Bank' in input_file:
+        cbd_df = df_input[df_input['DomainName']=='OLT - Emirates Islamic Bank']
+        return cbd_df
+
     
     elif 'Emirates-NBD-Classic-Passenger' in input_file:
         emirates_nbd_classic_passenger_df= df_input[df_input['DomainName']=='Emirates NBD-Classic Passenger']
@@ -208,15 +209,13 @@ def main(myblob: func.InputStream):
     df_template = pd.read_excel(template_file_path)
     df_reference = pd.read_excel(template_file_path, sheet_name="term_references")
     logging.info(df_template.columns)
-    blob_service_client = BlobServiceClient.from_connection_string(connection_string)
-    container_client = blob_service_client.get_container_client("akcsaiamodel")
-    model_path = container_client.get_blob_client("AkcsNlpCustommodel.pkl")
-    vectorizer_path = container_client.get_blob_client("vectorizer.pkl")
+
     server = "akcserver.database.windows.net"
     database = "dbarunsql"
     username = "Arun" 
     password = "Asds@2022"
     table_name = "TransactionDetails"
+    
 
     try:
         
@@ -231,6 +230,15 @@ def main(myblob: func.InputStream):
         nlp_classified_data_without_nulls = nlp_classified.dropna(subset=['Narration'])
         nlp_bank_transactions = nlp_classified_data_without_nulls['Narration']
         
+        aiblob_service_client = BlobServiceClient.from_connection_string(connection_string)
+        aicontainer_client = aiblob_service_client.get_container_client("akcsaiamodel")
+        aiblob_client_akcsmodel = aicontainer_client.get_blob_client("AkcsNlpCustommodel.pkl")
+        aiblob_data_akcsmodel = aiblob_client_akcsmodel.download_blob().readall()
+        model_path = pickle.loads(aiblob_data_akcsmodel)
+        
+        aiblob_client_vecmodel = aicontainer_client.get_blob_client("vectorizer.pkl")
+        aiblob_data_vecmodel = aiblob_client_vecmodel.download_blob().readall()
+        vectorizer_path = pickle.loads(aiblob_data_vecmodel)
         predictions = predict_transactions(nlp_bank_transactions, model_path, vectorizer_path)
         
         # Print the predictions
