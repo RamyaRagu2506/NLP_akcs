@@ -14,20 +14,43 @@ def read_user_input_data(input_file, df_input):
     current_datetime = datetime.now()
     Current_Date= current_datetime.strftime("%Y-%m-%d")
     filter_date = pd.to_datetime(Current_Date).date()
-    print(filter_date)
+    
+    logging.info(filter_date)
+    
     df_input['ModelDate'] = pd.to_datetime(df_input['ModelCopyDateTime'])
     df_input['ModelDateExtracted']=df_input['ModelDate'].dt.date
     df_input =  df_input[df_input['ModelDateExtracted']==filter_date]
-    if 'NBD' in input_file:
-        nbd_df = df_input[df_input['DomainName']=='NBD']  
+    
+    if 'Emirates-NBD-Classic-Luxury-Main' in input_file:
+        nbd_df = df_input[df_input['DomainName']=='Emirates NBD-Classic Luxury-Main']  
         return nbd_df
     
-    elif 'CLTRAK' in input_file:
-        clt_rak_df = df_input[df_input['DomainName']=='CLTRAK']
+    elif 'Rak-Bank-Classic-Luxury' in input_file:
+        clt_rak_df = df_input[df_input['DomainName']=='Rak Bank-Classic Luxury']
         return clt_rak_df
     
-    elif 'CBD' in input_file:
-        cbd_df = df_input[df_input['DomainName']=='CBD']
+    elif 'CLT-ADCB' in input_file:
+        cbd_df = df_input[df_input['DomainName']=='CLT - ADCB']
+        return cbd_df
+    
+    elif 'CBD-Bank' in input_file:
+        cbd_df = df_input[df_input['DomainName']=='CBD Bank']
+        return cbd_df
+    
+    elif 'EIB-Loan account' in input_file:
+        cbd_df = df_input[df_input['DomainName']=='EIB - Loan account']
+        return cbd_df
+    
+    elif 'OLT-Emirates Islamic Bank' in input_file:
+        cbd_df = df_input[df_input['DomainName']=='OLT - Emirates Islamic Bank']
+        return cbd_df
+    
+    elif 'Emirates-NBD-Classic-Passenger' in input_file:
+        cbd_df = df_input[df_input['DomainName']=='Emirates NBD-Classic Passenger']
+        return cbd_df
+    
+    elif 'ENBD-Classic-Riders' in input_file:
+        cbd_df = df_input[df_input['DomainName']=='ENBD - Classic Riders']
         return cbd_df
     
     else: 
@@ -95,8 +118,8 @@ def populate_final_report(report_template, nlp_classified_df, input_file_path):
             debit_sum = filtered_df['Debit'].sum()
             credit_sum = filtered_df['Credit'].sum()
             total_sum = credit_sum + (-debit_sum)
-            report_template.loc[report_template['Description'] == description, 'Emirates NBD-Classic Luxury-Main'] = total_sum
-        report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'Emirates NBD-Classic Luxury-Main'] = report_template['Emirates NBD-Classic Luxury-Main'][1:12].sum()
+            report_template.loc[report_template['Description'] == description, 'CBD Bank'] = total_sum
+        report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'CBD Bank'] = report_template['CBD Bank'][1:12].sum()
 
     elif 'CLTRAK' in input_file_path:
         
@@ -173,7 +196,7 @@ def main(myblob: func.InputStream):
         container_name = "outputreport"
         file_name = f"output_report_{now_date}"
         
-        save_dataframe_to_blob(populate_final_report,connection_string, container_name, file_name)
+        save_dataframe_to_blob(populate_report_template,connection_string, container_name, file_name)
 
     except Exception as e:
         logging.error(e)
