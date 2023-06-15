@@ -101,7 +101,7 @@ def fetch_data_from_sql(server, database, username, password, table_name):
     return df
 
 def populate_final_report(report_template, nlp_classified_df, input_file_path):
-    if 'NBD' in input_file_path:
+    if 'Emirates-NBD-Classic-Luxury-Main' in input_file_path:
         
         for description in report_template['Description']:
             filtered_df = nlp_classified_df[nlp_classified_df['Prediction'] == description]
@@ -111,7 +111,7 @@ def populate_final_report(report_template, nlp_classified_df, input_file_path):
             report_template.loc[report_template['Description'] == description, 'Emirates NBD-Classic Luxury-Main'] = total_sum
         report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'Emirates NBD-Classic Luxury-Main'] = report_template['Emirates NBD-Classic Luxury-Main'][1:12].sum()
         
-    elif 'CBD' in input_file_path:
+    elif 'CBD-Bank' in input_file_path:
         
         for description in report_template['Description']:
             filtered_df = nlp_classified_df[nlp_classified_df['Prediction'] == description]
@@ -121,7 +121,7 @@ def populate_final_report(report_template, nlp_classified_df, input_file_path):
             report_template.loc[report_template['Description'] == description, 'CBD Bank'] = total_sum
         report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'CBD Bank'] = report_template['CBD Bank'][1:12].sum()
 
-    elif 'CLTRAK' in input_file_path:
+    elif 'Rak-Bank-Classic-Luxury' in input_file_path:
         
         for description in report_template['Description']:
             filtered_df = nlp_classified_df[nlp_classified_df['Prediction'] == description]
