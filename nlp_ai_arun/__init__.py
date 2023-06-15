@@ -153,8 +153,10 @@ def main(myblob: func.InputStream):
         preprocessed_data = general_preprocess(df_input_bank_statement)
         pdf_based_file_preprocessed_data = preprocess_text_data(preprocessed_data)
         report_template = preprocess_template_data(df_template)
+ 
         
-        nlp_classified_data_without_nulls = pdf_based_file_preprocessed_data.dropna(subset=['Narration'])
+        nlp_classified = pdf_based_file_preprocessed_data.dropna(subset=['Narration'])
+        nlp_classified_data_without_nulls = nlp_classified.dropna(subset=['Narration'])
         nlp_bank_transactions = nlp_classified_data_without_nulls['Narration']
         
         predictions = predict_transactions(nlp_bank_transactions, model_path, vectorizer_path)
