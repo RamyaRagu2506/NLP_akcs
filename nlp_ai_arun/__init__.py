@@ -87,14 +87,14 @@ def predict_transactions(new_transactions, model_path, vectorizer_path):
 
     return predictions
 
-def fetch_data_from_sql(server, database, username, password, table_name):
+def fetch_data_from_sql(server, database, username, password, table_name, domain_name):
     # Establish the database connection
     conn_str = f"DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password}"
     conn = pyodbc.connect(conn_str)
 
     # Read rows from the SQL table
     cursor = conn.cursor()
-    cursor.execute(f"SELECT * FROM {table_name}")
+    cursor.execute(f"SELECT * FROM {table_name} where DomainName = {domain_name}")
     rows = cursor.fetchall()
 
     # Convert the result to a DataFrame
@@ -205,6 +205,8 @@ def main(myblob: func.InputStream):
     logging.info(f"Blob trigger function processed blob \n"
                  f"Name: {myblob.name}\n"
                  f"Blob Size: {myblob.length} bytes")  
+    
+    input_file = myblob.name
     template_file_path = "https://arunakcs.blob.core.windows.net/excelfiles/main_template/test_template.xlsx"
     df_template = pd.read_excel(template_file_path)
     df_reference = pd.read_excel(template_file_path, sheet_name="term_references")
@@ -215,13 +217,32 @@ def main(myblob: func.InputStream):
     username = "Arun" 
     password = "Asds@2022"
     table_name = "TransactionDetails"
-    connection_string = "DefaultEndpointsProtocol=https;AccountName=arunakcs;AccountKey=nx8T5960W1vcaeHKOD/4HtiCm0/n58VXhtsNAp7LoyDdZX6IdRPsomJsBoOgB72wPd9AHfwwcoFo+AStndZq2Q==;EndpointSuffix=core.windows.net"
-        
-
+    connection_string = "DefaultEndpointsProtocol=https;AccountName=arunakcs;AccountKey=nx8T5960W1vcaeHKOD/4HtiCm0/n58VXhtsNAp7LoyDdZX6IdRPsomJsBoOgB72wPd9AHfwwcoFo+AStndZq2Q==;EndpointSuffix=core.windows.net"    
     try:
+        if 'Emirates-NBD-Classic-Luxury-Main' in input_file:
+            domain_name = 'Emirates-NBD-Classic-Luxury-Main'
+        elif 'Rak-Bank-Classic-Luxury' in input_file:
+            domain_name = 'Rak-Bank-Classic-Luxury'
+        elif 'CLT-ADCB' in input_file:
+            domain_name = 'CLT-ADCB'
+        elif 'CBD-Bank' in input_file:
+            domain_name = 'CBD-Bank'
+        elif 'EIB-Loan-account' in input_file:
+            domain_name = 'EIB-Loan-account'
+        elif 'OLT-Emirates-Islamic-Bank' in input_file:
+            domain_name = 'OLT-Emirates-Islamic-Bank'
+    
+        elif 'Emirates-NBD-Classic-Passenger' in input_file:
+            domain_name = 'Emirates-NBD-Classic-Passenger'
+    
+        elif 'ENBD-Classic-Riders' in input_file:
+            domain_name = 'ENBD-Classic-Riders'
         
-        df_input_bank_statement_from_sql = fetch_data_from_sql(server, database, username, password, table_name)
+        df_input_bank_statement_from_sql = fetch_data_from_sql(server, database, username, password, table_name, domain_name)
+        logging.info(f"Data has been fetched from {database} and the table {table_name}")
+        
         df_input_bank_statement = read_user_input_data(myblob.name,df_input_bank_statement_from_sql)
+        
         preprocessed_data = general_preprocess(df_input_bank_statement)
         pdf_based_file_preprocessed_data = preprocess_text_data(preprocessed_data)
         report_template = preprocess_template_data(df_template)
