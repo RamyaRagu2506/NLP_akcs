@@ -106,24 +106,25 @@ def populate_final_report(report_template, nlp_classified_df, input_file_path):
     database = "dbarunsql"
     username = "Arun" 
     password = "Asds@2022"
-    driver = '{ODBC Driver 17 for SQL Server}'  # Update the driver if needed
     
     conn_str = f"DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password}"
     conn = pyodbc.connect(conn_str)
     closingbalanceTableName = "DailyTransactionBalance"
-    CreatedDate = datetime.now()
-    ModifiedDate = datetime.now()
+    
     if 'Emirates-NBD-Classic-Luxury-Main' in input_file_path:
-        
+        logging.info(f"{len(nlp_classified_df)}")
+        logging.info(f"{len(report_template)}")
+        logging.info(f"{report_template}")
         for description in report_template['Description']:
             filtered_df = nlp_classified_df[nlp_classified_df['Prediction'] == description]
+            logging.info(f"{len(filtered_df)}")
             debit_sum = filtered_df['Debit'].sum()
             credit_sum = filtered_df['Credit'].sum()
             total_sum = credit_sum + (-debit_sum)
             report_template.loc[report_template['Description'] == description, 'Emirates NBD-Classic Luxury-Main'] = total_sum
         closingBalance = report_template['Emirates NBD-Classic Luxury-Main'][1:12].sum()
         report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'Emirates NBD-Classic Luxury-Main'] = report_template['Emirates NBD-Classic Luxury-Main'][1:12].sum()
-        
+        logging.info(f"{report_template['Emirates NBD-Classic Luxury-Main']}")
         cursor = conn.cursor()
         sql = f"INSERT INTO {closingbalanceTableName} (ClosingBalanceDomainCompany, CreatedDate, ModifiedDate, ClosingBalance) " \
               f"VALUES (?, ?, ?, ?)"
