@@ -214,18 +214,18 @@ def populate_final_report(report_template, nlp_classified_df, input_file_path):
 
 def save_dataframe_to_blob(dataframe, connection_string, container_name, excel_file_name):
     # Save DataFrame to Excel file
-    excel_file = excel_file_name
-    dataframe.to_excel(excel_file, index=False)
     report_file = BytesIO()
+    dataframe.to_excel(report_file, index=False)
+    report_file.seek(0)
     
     
     # Upload Excel file to Blob storage
     blob_service_client = BlobServiceClient.from_connection_string(connection_string)
     container_client = blob_service_client.get_container_client(container_name)
-    blob_client = container_client.get_blob_client(excel_file)
+    blob_client = container_client.get_blob_client(excel_file_name)
 
     
-    blob_client.upload_blob(excel_file, overwrite=True, content_settings=ContentSettings(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'))
+    blob_client.upload_blob(report_file, overwrite=True, content_settings=ContentSettings(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'))
 
 
 def main(myblob: func.InputStream):
