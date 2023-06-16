@@ -205,7 +205,6 @@ def main(myblob: func.InputStream):
                  f"Name: {myblob.name}\n"
                  f"Blob Size: {myblob.length} bytes")  
     
-    input_file = myblob.name
     template_file_path = "https://arunakcs.blob.core.windows.net/excelfiles/main_template/test_template.xlsx"
     df_template = pd.read_excel(template_file_path)
     df_reference = pd.read_excel(template_file_path, sheet_name="term_references")
@@ -217,13 +216,20 @@ def main(myblob: func.InputStream):
     password = "Asds@2022"
     table_name = "TransactionDetails"
     connection_string = "DefaultEndpointsProtocol=https;AccountName=arunakcs;AccountKey=nx8T5960W1vcaeHKOD/4HtiCm0/n58VXhtsNAp7LoyDdZX6IdRPsomJsBoOgB72wPd9AHfwwcoFo+AStndZq2Q==;EndpointSuffix=core.windows.net"    
+    blob_service_client = BlobServiceClient.from_connection_string(connection_string)
+    container_name = 'functionapp-pdf'
+    container_client = blob_service_client.get_container_client(container_name)
+    blobs = container_client.list_blobs()
+    latest_blob = max(blobs, key=lambda blob: blob.last_modified)
+    latest_blob_name = latest_blob.name
+    input_file = latest_blob_name
     try:
         
         df_input_bank_statement_from_sql = fetch_data_from_sql(server, database, username, password, table_name)
         logging.info(f"Data has been fetched from {database} and the table {table_name}")
         logging.info(f"{len(df_input_bank_statement_from_sql)}")
         
-        df_input_bank_statement = read_user_input_data(myblob.name,df_input_bank_statement_from_sql)
+        df_input_bank_statement = read_user_input_data(input_file,df_input_bank_statement_from_sql)
         logging.info(f"{len(df_input_bank_statement)} Input bank statement")
         
         preprocessed_data = general_preprocess(df_input_bank_statement)
@@ -253,7 +259,7 @@ def main(myblob: func.InputStream):
         predictions = predict_transactions(nlp_bank_transactions, model_weights, vectorizer_weights)
 
         pdf_based_file_preprocessed_data['Prediction'] = predictions
-        populate_report_template = populate_final_report(report_template, pdf_based_file_preprocessed_data, myblob.name)
+        populate_report_template = populate_final_report(report_template, pdf_based_file_preprocessed_data, input_file)
         
         now_date = datetime.now()
         container_name = "outputreport"
