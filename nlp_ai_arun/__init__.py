@@ -23,43 +23,45 @@ def read_user_input_data(input_file, df_input):
     df_input =  df_input[df_input['ModelDateExtracted']==filter_date]
     
     if 'Emirates-NBD-Classic-Luxury-Main' in input_file:
-        nbd_df = df_input[df_input['DomainName']=='Emirates NBD-Classic Luxury-Main']  
+        nbd_df = df_input[df_input['DomainName']=='Emirates-NBD-Classic-Luxury-Main']  
         return nbd_df
     
     elif 'Rak-Bank-Classic-Luxury' in input_file:
-        clt_rak_df = df_input[df_input['DomainName']=='Rak Bank-Classic Luxury']
+        clt_rak_df = df_input[df_input['DomainName']=='Rak-Bank-Classic-Luxury']
         return clt_rak_df
     
     elif 'CLT-ADCB' in input_file:
-        clt_adcb_df = df_input[df_input['DomainName']=='CLT - ADCB']
+        clt_adcb_df = df_input[df_input['DomainName']=='CLT-ADCB']
         return clt_adcb_df
     
     elif 'CBD-Bank' in input_file:
-        cbd_df = df_input[df_input['DomainName']=='CBD Bank']
+        cbd_df = df_input[df_input['DomainName']=='CBD-Bank']
         return cbd_df
     
     elif 'EIB-Loan-account' in input_file:
-        cbd_df = df_input[df_input['DomainName']=='EIB - Loan account']
+        cbd_df = df_input[df_input['DomainName']=='EIB-Loan account']
         return cbd_df
     
     elif 'OLT-Emirates-Islamic-Bank' in input_file:
-        cbd_df = df_input[df_input['DomainName']=='OLT - Emirates Islamic Bank']
+        cbd_df = df_input[df_input['DomainName']=='OLT-Emirates-Islamic-Bank']
         return cbd_df
 
     
     elif 'Emirates-NBD-Classic-Passenger' in input_file:
-        emirates_nbd_classic_passenger_df= df_input[df_input['DomainName']=='Emirates NBD-Classic Passenger']
+        emirates_nbd_classic_passenger_df= df_input[df_input['DomainName']=='Emirates-NBD-Classic-Passenger']
         return emirates_nbd_classic_passenger_df
     
     elif 'ENBD-Classic-Riders' in input_file:
-        enbd_classic_riders_df = df_input[df_input['DomainName']=='ENBD - Classic Riders']
+        enbd_classic_riders_df = df_input[df_input['DomainName']=='ENBD-Classic-Riders']
         return enbd_classic_riders_df
     
     else: 
         print(f'{input_file} Does not exist.')
         
 def general_preprocess(input_df):
-    dropped_df = input_df['TransactionDate'].dropna()
+    if input_df['TransactionDate'].isnull().sum() > 0:
+        dropped_df = input_df['TransactionDate'].dropna()
+        return input_df
     return input_df
 
 def preprocess_template_data(input_dataframe):
@@ -87,14 +89,14 @@ def predict_transactions(new_transactions, model_path, vectorizer_path):
 
     return predictions
 
-def fetch_data_from_sql(server, database, username, password, table_name, domain_name):
+def fetch_data_from_sql(server, database, username, password, table_name):
     # Establish the database connection
     conn_str = f"DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password}"
     conn = pyodbc.connect(conn_str)
 
     # Read rows from the SQL table
     cursor = conn.cursor()
-    cursor.execute(f"SELECT * FROM {table_name} where DomainName = {domain_name}")
+    cursor.execute(f"SELECT * FROM {table_name}")
     rows = cursor.fetchall()
 
     # Convert the result to a DataFrame
@@ -219,34 +221,21 @@ def main(myblob: func.InputStream):
     table_name = "TransactionDetails"
     connection_string = "DefaultEndpointsProtocol=https;AccountName=arunakcs;AccountKey=nx8T5960W1vcaeHKOD/4HtiCm0/n58VXhtsNAp7LoyDdZX6IdRPsomJsBoOgB72wPd9AHfwwcoFo+AStndZq2Q==;EndpointSuffix=core.windows.net"    
     try:
-        if 'Emirates-NBD-Classic-Luxury-Main' in input_file:
-            domain_name = 'Emirates-NBD-Classic-Luxury-Main'
-        elif 'Rak-Bank-Classic-Luxury' in input_file:
-            domain_name = 'Rak-Bank-Classic-Luxury'
-        elif 'CLT-ADCB' in input_file:
-            domain_name = 'CLT-ADCB'
-        elif 'CBD-Bank' in input_file:
-            domain_name = 'CBD-Bank'
-        elif 'EIB-Loan-account' in input_file:
-            domain_name = 'EIB-Loan-account'
-        elif 'OLT-Emirates-Islamic-Bank' in input_file:
-            domain_name = 'OLT-Emirates-Islamic-Bank'
-    
-        elif 'Emirates-NBD-Classic-Passenger' in input_file:
-            domain_name = 'Emirates-NBD-Classic-Passenger'
-    
-        elif 'ENBD-Classic-Riders' in input_file:
-            domain_name = 'ENBD-Classic-Riders'
         
-        df_input_bank_statement_from_sql = fetch_data_from_sql(server, database, username, password, table_name, domain_name)
+        df_input_bank_statement_from_sql = fetch_data_from_sql(server, database, username, password, table_name)
         logging.info(f"Data has been fetched from {database} and the table {table_name}")
         
         df_input_bank_statement = read_user_input_data(myblob.name,df_input_bank_statement_from_sql)
+        logging.info(f"{df_input_bank_statement} Input bank statement")
         
         preprocessed_data = general_preprocess(df_input_bank_statement)
+        logging.info(f"{preprocessed_data} Preprocessed data")
+        
         pdf_based_file_preprocessed_data = preprocess_text_data(preprocessed_data)
+        logging.info(f"{pdf_based_file_preprocessed_data} PDF File preprocessed data")
+        
         report_template = preprocess_template_data(df_template)
- 
+        logging.info(f"report template")
         
         nlp_classified = pdf_based_file_preprocessed_data.dropna(subset=['Narration'])
         nlp_classified_data_without_nulls = nlp_classified.dropna(subset=['Narration'])
@@ -261,6 +250,8 @@ def main(myblob: func.InputStream):
         aiblob_client_vecmodel = aicontainer_client.get_blob_client("vectorizer.pkl")
         aiblob_data_vecmodel = aiblob_client_vecmodel.download_blob().readall()
         vectorizer_path = pickle.loads(aiblob_data_vecmodel)
+        
+        logging.info("Predictiing using Model path")
         predictions = predict_transactions(nlp_bank_transactions, model_path, vectorizer_path)
         
         # Print the predictions
