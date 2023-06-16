@@ -21,9 +21,11 @@ def read_user_input_data(input_file, df_input):
     df_input['ModelDate'] = pd.to_datetime(df_input['ModelCopyDateTime'])
     df_input['ModelDateExtracted']=df_input['ModelDate'].dt.date
     df_input =  df_input[df_input['ModelDateExtracted']==filter_date]
+    logging.info(f"{len(df_input)}")
     
     if 'Emirates-NBD-Classic-Luxury-Main' in input_file:
         nbd_df = df_input[df_input['DomainName']=='Emirates-NBD-Classic-Luxury-Main']  
+        logging.info(f"{len(nbd_df)}")
         return nbd_df
     
     elif 'Rak-Bank-Classic-Luxury' in input_file:
@@ -219,15 +221,16 @@ def main(myblob: func.InputStream):
         
         df_input_bank_statement_from_sql = fetch_data_from_sql(server, database, username, password, table_name)
         logging.info(f"Data has been fetched from {database} and the table {table_name}")
+        logging.info(f"{len(df_input_bank_statement_from_sql)}")
         
         df_input_bank_statement = read_user_input_data(myblob.name,df_input_bank_statement_from_sql)
-        logging.info(f"{df_input_bank_statement} Input bank statement")
+        logging.info(f"{len(df_input_bank_statement)} Input bank statement")
         
         preprocessed_data = general_preprocess(df_input_bank_statement)
-        logging.info(f"{preprocessed_data} Preprocessed data")
+        logging.info(f"{len(preprocessed_data)} Preprocessed data")
         
         pdf_based_file_preprocessed_data = preprocess_text_data(preprocessed_data)
-        logging.info(f"{pdf_based_file_preprocessed_data} PDF File preprocessed data")
+        logging.info(f"{len(pdf_based_file_preprocessed_data)} PDF File preprocessed data")
         
         report_template = preprocess_template_data(df_template)
         logging.info(f"report template")
@@ -248,10 +251,6 @@ def main(myblob: func.InputStream):
         
         logging.info("Predictiing using Model path")
         predictions = predict_transactions(nlp_bank_transactions, model_weights, vectorizer_weights)
-        
-        # Print the predictions
-        # for transaction, prediction in zip(nlp_bank_transactions, predictions):
-        #     logging.info(f'Transaction: {transaction}\nPrediction: {prediction}')
 
         pdf_based_file_preprocessed_data['Prediction'] = predictions
         populate_report_template = populate_final_report(report_template, pdf_based_file_preprocessed_data, myblob.name)
