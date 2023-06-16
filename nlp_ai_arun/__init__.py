@@ -10,6 +10,8 @@ from datetime import datetime
 from joblib import dump, load
 from sklearn.feature_extraction.text import TfidfVectorizer
 import pickle
+from io import BytesIO
+
 
 def read_user_input_data(input_file, df_input):
     current_datetime = datetime.now()
@@ -210,21 +212,21 @@ def populate_final_report(report_template, nlp_classified_df, input_file_path):
         return report_template
 
 
-def save_dataframe_to_blob(dataframe, connection_string, container_name, file_name):
+def save_dataframe_to_blob(dataframe, connection_string, container_name, excel_file_name):
     # Save DataFrame to Excel file
-    excel_file = f"{file_name}.xlsx"
+    excel_file = excel_file_name
     dataframe.to_excel(excel_file, index=False)
-
+    report_file = BytesIO()
+    
+    
     # Upload Excel file to Blob storage
     blob_service_client = BlobServiceClient.from_connection_string(connection_string)
     container_client = blob_service_client.get_container_client(container_name)
     blob_client = container_client.get_blob_client(excel_file)
 
-    with open(excel_file, "rb") as file:
-        blob_client.upload_blob(file, overwrite=True, content_settings=ContentSettings(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'))
+    
+    blob_client.upload_blob(excel_file, overwrite=True, content_settings=ContentSettings(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'))
 
-    # Delete the local Excel file
-    os.remove(excel_file)
 
 def main(myblob: func.InputStream):
     
@@ -290,9 +292,9 @@ def main(myblob: func.InputStream):
         
         now_date = datetime.now()
         container_name = "outputreport"
-        file_name = f"output_report_{now_date.date()}_{now_date.minute}_{now_date.second}"
+        excel_file_name = f"output_report_{now_date.date()}_{now_date.minute}_{now_date.second}.xlsx"
         
-        save_dataframe_to_blob(populate_report_template,connection_string, container_name, file_name)
+        save_dataframe_to_blob(populate_report_template,connection_string, container_name, excel_file_name)
 
     except Exception as e:
         logging.error(e)
