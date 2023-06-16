@@ -74,18 +74,13 @@ def preprocess_text_data(input_df):
     input_df['lowered_narration'] = lowered_narration_data_series
     return input_df
 
-def predict_transactions(new_transactions, model_path, vectorizer_path):
-    # Load the saved model
-    model = load(model_path)
-
-    # Load the saved vectorizer
-    vectorizer = load(vectorizer_path)
+def predict_transactions(new_transactions, model_weights, vectorizer_weights):
 
     # Vectorize the new data
-    new_transactions_vectorized = vectorizer.transform(new_transactions)
+    new_transactions_vectorized = vectorizer_weights.transform(new_transactions)
 
     # Predict using the loaded model
-    predictions = model.predict(new_transactions_vectorized)
+    predictions = model_weights.predict(new_transactions_vectorized)
 
     return predictions
 
@@ -145,7 +140,7 @@ def populate_final_report(report_template, nlp_classified_df, input_file_path):
             report_template.loc[report_template['Description'] == description, 'CLT-ADCB'] = total_sum
         report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'CLT-ADCB'] = report_template['CLT-ADCB'][1:12].sum()
 
-    elif 'EIB-Loan account' in input_file_path:
+    elif 'EIB-Loan-account' in input_file_path:
         
         for description in report_template['Description']:
             filtered_df = nlp_classified_df[nlp_classified_df['Prediction'] == description]
@@ -155,7 +150,7 @@ def populate_final_report(report_template, nlp_classified_df, input_file_path):
             report_template.loc[report_template['Description'] == description, 'EIB-Loan account'] = total_sum
         report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'EIB-Loan account'] = report_template['EIB-Loan account'][1:12].sum()
 
-    elif 'OLT - Emirates Islamic Bank' in input_file_path:
+    elif 'OLT-Emirates-Islamic-Bank' in input_file_path:
         
         for description in report_template['Description']:
             filtered_df = nlp_classified_df[nlp_classified_df['Prediction'] == description]
@@ -174,7 +169,7 @@ def populate_final_report(report_template, nlp_classified_df, input_file_path):
             report_template.loc[report_template['Description'] == description, 'Emirates-NBD-Classic-Passenger'] = total_sum
         report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'Emirates-NBD-Classic-Passenger'] = report_template['Emirates-NBD-Classic-Passenger'][1:12].sum()
 
-    elif 'ENBD - Classic Riders' in input_file_path:
+    elif 'ENBD-Classic-Riders' in input_file_path:
         for description in report_template['Description']:
             filtered_df = nlp_classified_df[nlp_classified_df['Prediction'] == description]
             debit_sum = filtered_df['Debit'].sum()
@@ -245,25 +240,25 @@ def main(myblob: func.InputStream):
         aicontainer_client = aiblob_service_client.get_container_client("akcsaiamodel")
         aiblob_client_akcsmodel = aicontainer_client.get_blob_client("AkcsNlpCustommodel_V1.pkl")
         aiblob_data_akcsmodel = aiblob_client_akcsmodel.download_blob().readall()
-        model_path = pickle.loads(aiblob_data_akcsmodel)
+        model_weights = pickle.loads(aiblob_data_akcsmodel)
         
         aiblob_client_vecmodel = aicontainer_client.get_blob_client("Vectorizer_V1.pkl")
         aiblob_data_vecmodel = aiblob_client_vecmodel.download_blob().readall()
-        vectorizer_path = pickle.loads(aiblob_data_vecmodel)
+        vectorizer_weights = pickle.loads(aiblob_data_vecmodel)
         
         logging.info("Predictiing using Model path")
-        predictions = predict_transactions(nlp_bank_transactions, model_path, vectorizer_path)
+        predictions = predict_transactions(nlp_bank_transactions, model_weights, vectorizer_weights)
         
         # Print the predictions
-        for transaction, prediction in zip(nlp_bank_transactions, predictions):
-            logging.info(f'Transaction: {transaction}\nPrediction: {prediction}')
+        # for transaction, prediction in zip(nlp_bank_transactions, predictions):
+        #     logging.info(f'Transaction: {transaction}\nPrediction: {prediction}')
 
         pdf_based_file_preprocessed_data['Prediction'] = predictions
         populate_report_template = populate_final_report(report_template, pdf_based_file_preprocessed_data, myblob.name)
         
         now_date = datetime.now()
         container_name = "outputreport"
-        file_name = f"output_report_{now_date}"
+        file_name = f"output_report_{now_date.date()}_{now_date.minute}_{now_date.second}"
         
         save_dataframe_to_blob(populate_report_template,connection_string, container_name, file_name)
 
