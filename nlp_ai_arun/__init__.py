@@ -243,11 +243,11 @@ def main(myblob: func.InputStream):
         
         aiblob_service_client = BlobServiceClient.from_connection_string(connection_string)
         aicontainer_client = aiblob_service_client.get_container_client("akcsaiamodel")
-        aiblob_client_akcsmodel = aicontainer_client.get_blob_client("AkcsNlpCustommodel.pkl")
+        aiblob_client_akcsmodel = aicontainer_client.get_blob_client("AkcsNlpCustommodel_V1.pkl")
         aiblob_data_akcsmodel = aiblob_client_akcsmodel.download_blob().readall()
         model_path = pickle.loads(aiblob_data_akcsmodel)
         
-        aiblob_client_vecmodel = aicontainer_client.get_blob_client("vectorizer.pkl")
+        aiblob_client_vecmodel = aicontainer_client.get_blob_client("Vectorizer_V1.pkl")
         aiblob_data_vecmodel = aiblob_client_vecmodel.download_blob().readall()
         vectorizer_path = pickle.loads(aiblob_data_vecmodel)
         
