@@ -215,7 +215,8 @@ def main(myblob: func.InputStream):
     username = "Arun" 
     password = "Asds@2022"
     table_name = "TransactionDetails"
-    
+    connection_string = "DefaultEndpointsProtocol=https;AccountName=arunakcs;AccountKey=nx8T5960W1vcaeHKOD/4HtiCm0/n58VXhtsNAp7LoyDdZX6IdRPsomJsBoOgB72wPd9AHfwwcoFo+AStndZq2Q==;EndpointSuffix=core.windows.net"
+        
 
     try:
         
@@ -249,7 +250,6 @@ def main(myblob: func.InputStream):
         populate_report_template = populate_final_report(report_template, pdf_based_file_preprocessed_data, myblob.name)
         
         now_date = datetime.now()
-        connection_string = "DefaultEndpointsProtocol=https;AccountName=arunakcs;AccountKey=nx8T5960W1vcaeHKOD/4HtiCm0/n58VXhtsNAp7LoyDdZX6IdRPsomJsBoOgB72wPd9AHfwwcoFo+AStndZq2Q==;EndpointSuffix=core.windows.net"
         container_name = "outputreport"
         file_name = f"output_report_{now_date}"
         
