@@ -95,7 +95,7 @@ def fetch_data_from_sql(server, database, username, password, table_name):
 
     # Read rows from the SQL table
     cursor = conn.cursor()
-    cursor.execute(f"SELECT * FROM {table_name}")
+    cursor.execute(f"SELECT * FROM {table_name} where Classified = 'No'")
     rows = cursor.fetchall()
 
     # Convert the result to a DataFrame
@@ -296,7 +296,38 @@ def populate_final_report(report_template, nlp_classified_df, input_file_path):
         conn.close
         return report_template
 
+def update_sql_table(pdf_based_file_preprocessed_data, server, database, username, password, table_name):
+    # Load the dataframe from Azure SQL or any other data source
+    # For the purpose of this example, let's assume the dataframe is already loaded
+    # into a variable named "pdf_based_file_preprocessed_data"
 
+    # Check if the 'Classified' column is 'No'
+    condition = (pdf_based_file_preprocessed_data['Classified'] == 'No')
+
+    # Filter the dataframe to get only the rows where the condition is True
+    filtered_df = pdf_based_file_preprocessed_data.loc[condition]
+
+    # Get the IDs of the rows where the condition is True
+    ids_to_update = filtered_df['TransactionId'].tolist()
+
+    # Create the connection string
+    conn_str = f"DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password}"
+
+    # Connect to Azure SQL
+    conn = pyodbc.connect(conn_str)
+    cursor = conn.cursor()
+
+    # Update the SQL table for each ID
+    for id_to_update in ids_to_update:
+        update_query = f"UPDATE {table_name} SET Classified = 'Yes' WHERE TransactionId = {id_to_update}"
+        cursor.execute(update_query)
+
+    # Commit the changes and close the connection
+    conn.commit()
+    conn.close()
+
+    # Return the list of IDs that were updated
+    return ids_to_update
 def save_dataframe_to_blob(dataframe, connection_string, container_name, excel_file_name):
     # Save DataFrame to Excel file
     report_file = BytesIO()
@@ -373,6 +404,28 @@ def main(myblob: func.InputStream):
         predictions = predict_transactions(nlp_bank_transactions, model_weights, vectorizer_weights)
 
         pdf_based_file_preprocessed_data['Prediction'] = predictions
+        
+        update_sql_table(pdf_based_file_preprocessed_data, server, database, username, password, table_name)
+    #     condition = (pdf_based_file_preprocessed_data['Classified'] == 'No')
+    
+    #     filtered_df = pdf_based_file_preprocessed_data.loc[condition]
+    #     ids_to_update = filtered_df['TransactionId'].tolist()
+
+    #     conn_str = f"DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password}"    
+    #     conn = pyodbc.connect(conn_str)
+    #     cursor = conn.cursor()
+
+    # # Update the SQL table for each ID
+    #     print(ids_to_update)
+    #     for id_to_update in ids_to_update:
+    #         update_query = f"UPDATE {table_name} SET Classified = 'Yes' WHERE TransactionId = {id_to_update}"
+    #         cursor.execute(update_query)
+
+    # # Commit the changes and close the connection
+    #     conn.commit()
+    #     conn.close()
+        
+        
         populate_report_template = populate_final_report(report_template, pdf_based_file_preprocessed_data, input_file)
         
         now_date = datetime.now()
