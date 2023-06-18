@@ -1,14 +1,10 @@
 import logging
 import pandas as pd
 import azure.functions as func
-import logging
 from azure.storage.blob import BlobServiceClient, ContentSettings
 import os
 import pyodbc
-import re
 from datetime import datetime
-from joblib import dump, load
-from sklearn.feature_extraction.text import TfidfVectorizer
 import pickle
 from io import BytesIO
 
@@ -75,7 +71,7 @@ def read_user_input_data(input_file, df_input):
         return enbd_classic_riders_df
     
     else: 
-        print(f'{input_file} Does not exist.')
+        logging.info(f'{input_file} Does not exist.')
         
 def general_preprocess(input_df):
     if input_df['TransactionDate'].isnull().sum() > 0:
