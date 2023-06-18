@@ -12,6 +12,18 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 import pickle
 from io import BytesIO
 
+#Global Variables declared
+CLOSINGBALANCETABLENAME = os.environ["AkcsCLOSINGBALANCETABLENAME"]
+SERVER = os.environ["AkcsServer"]
+DATABASE = os.environ["AkcsDatabase"]
+USERNAME = os.environ["AkcsDBUsername"] 
+PASSWORD = os.environ["AkcsDBPassword"]
+TRANSACTIONDETAILSTABLENAME = os.environ["AkcsTransactionDetailsTable"]
+CONNECTIONSTRING = os.environ["AkcsStorageConnectionString"]   
+CONTAINERNAME = os.environ['AkcsTriggerContainerName']
+TEMPLATEFILEPATH = os.environ["AkcsTemplate_file_path"]
+OUTPUTREPORTCONTIAINERNAME = os.environ["Akcsoutputreport_container_name"]
+DATENOW = datetime.now()
 
 def read_user_input_data(input_file, df_input):
     current_datetime = datetime.now()
@@ -103,15 +115,10 @@ def fetch_data_from_sql(server, database, username, password, table_name):
     conn.close()
     return df
 
-def populate_final_report(report_template, nlp_classified_df, input_file_path):
-    server = "akcserver.database.windows.net"
-    database = "dbarunsql"
-    username = "Arun" 
-    password = "Asds@2022"
+def populate_final_report(report_template, nlp_classified_df, input_file_path, server, database, username, password):
     
     conn_str = f"DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password}"
     conn = pyodbc.connect(conn_str)
-    closingbalanceTableName = "DailyTransactionBalance"
     
     if 'Emirates-NBD-Classic-Luxury-Main' in input_file_path:
         logging.info(f"{len(nlp_classified_df)}")
@@ -128,7 +135,7 @@ def populate_final_report(report_template, nlp_classified_df, input_file_path):
         report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'Emirates NBD-Classic Luxury-Main'] = report_template['Emirates NBD-Classic Luxury-Main'][1:12].sum()
         logging.info(f"{report_template['Emirates NBD-Classic Luxury-Main']}")
         cursor = conn.cursor()
-        sql = f"INSERT INTO {closingbalanceTableName} (ClosingBalanceDomainCompany, CreatedDate, ModifiedDate, ClosingBalance) " \
+        sql = f"INSERT INTO {CLOSINGBALANCETABLENAME} (ClosingBalanceDomainCompany, CreatedDate, ModifiedDate, ClosingBalance) " \
               f"VALUES (?, ?, ?, ?)"
 
 # Prepare the values for the parameters
@@ -151,7 +158,7 @@ def populate_final_report(report_template, nlp_classified_df, input_file_path):
         closingBalance = report_template['CBD Bank'][1:12].sum()
         report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'CBD Bank'] = report_template['CBD Bank'][1:12].sum()
         cursor = conn.cursor()
-        sql = f"INSERT INTO {closingbalanceTableName} (ClosingBalanceDomainCompany, CreatedDate, ModifiedDate, ClosingBalance) " \
+        sql = f"INSERT INTO {CLOSINGBALANCETABLENAME} (ClosingBalanceDomainCompany, CreatedDate, ModifiedDate, ClosingBalance) " \
               f"VALUES (?, ?, ?, ?)"
 
 # Prepare the values for the parameters
@@ -176,7 +183,7 @@ def populate_final_report(report_template, nlp_classified_df, input_file_path):
         closingBalance = report_template['Rak Bank-Classic Luxury'][1:12].sum()
         report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'Rak Bank-Classic Luxury'] = report_template['Rak Bank-Classic Luxury'][1:12].sum()
         cursor = conn.cursor()
-        sql = f"INSERT INTO {closingbalanceTableName} (ClosingBalanceDomainCompany, CreatedDate, ModifiedDate, ClosingBalance) " \
+        sql = f"INSERT INTO {CLOSINGBALANCETABLENAME} (ClosingBalanceDomainCompany, CreatedDate, ModifiedDate, ClosingBalance) " \
               f"VALUES (?, ?, ?, ?)"
 
 # Prepare the values for the parameters
@@ -198,7 +205,7 @@ def populate_final_report(report_template, nlp_classified_df, input_file_path):
         closingBalance = report_template['CLT-ADCB'][1:12].sum()
         report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'CLT-ADCB'] = report_template['CLT-ADCB'][1:12].sum()
         cursor = conn.cursor()
-        sql = f"INSERT INTO {closingbalanceTableName} (ClosingBalanceDomainCompany, CreatedDate, ModifiedDate, ClosingBalance) " \
+        sql = f"INSERT INTO {CLOSINGBALANCETABLENAME} (ClosingBalanceDomainCompany, CreatedDate, ModifiedDate, ClosingBalance) " \
               f"VALUES (?, ?, ?, ?)"
 
 # Prepare the values for the parameters
@@ -220,7 +227,7 @@ def populate_final_report(report_template, nlp_classified_df, input_file_path):
         closingBalance = report_template['EIB-Loan account'][1:12].sum()
         report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'EIB-Loan account'] = report_template['EIB-Loan account'][1:12].sum()
         cursor = conn.cursor()
-        sql = f"INSERT INTO {closingbalanceTableName} (ClosingBalanceDomainCompany, CreatedDate, ModifiedDate, ClosingBalance) " \
+        sql = f"INSERT INTO {CLOSINGBALANCETABLENAME} (ClosingBalanceDomainCompany, CreatedDate, ModifiedDate, ClosingBalance) " \
               f"VALUES (?, ?, ?, ?)"
 
 # Prepare the values for the parameters
@@ -242,7 +249,7 @@ def populate_final_report(report_template, nlp_classified_df, input_file_path):
         closingBalance = report_template['OLT - Emirates Islamic Bank'][1:12].sum()
         report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'OLT - Emirates Islamic Bank'] = report_template['OLT - Emirates Islamic Bank'][1:12].sum()
         cursor = conn.cursor()
-        sql = f"INSERT INTO {closingbalanceTableName} (ClosingBalanceDomainCompany, CreatedDate, ModifiedDate, ClosingBalance) " \
+        sql = f"INSERT INTO {CLOSINGBALANCETABLENAME} (ClosingBalanceDomainCompany, CreatedDate, ModifiedDate, ClosingBalance) " \
               f"VALUES (?, ?, ?, ?)"
 
 # Prepare the values for the parameters
@@ -263,7 +270,7 @@ def populate_final_report(report_template, nlp_classified_df, input_file_path):
         closingBalance = report_template['Emirates-NBD-Classic-Passenger'][1:12].sum()
         report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'Emirates-NBD-Classic-Passenger'] = report_template['Emirates-NBD-Classic-Passenger'][1:12].sum()
         cursor = conn.cursor()
-        sql = f"INSERT INTO {closingbalanceTableName} (ClosingBalanceDomainCompany, CreatedDate, ModifiedDate, ClosingBalance) " \
+        sql = f"INSERT INTO {CLOSINGBALANCETABLENAME} (ClosingBalanceDomainCompany, CreatedDate, ModifiedDate, ClosingBalance) " \
               f"VALUES (?, ?, ?, ?)"
 
 # Prepare the values for the parameters
@@ -284,7 +291,7 @@ def populate_final_report(report_template, nlp_classified_df, input_file_path):
         closingBalance = report_template['ENBD - Classic Riders'][1:12].sum()
         report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'ENBD - Classic Riders'] = report_template['ENBD - Classic Riders'][1:12].sum() 
         cursor = conn.cursor()
-        sql = f"INSERT INTO {closingbalanceTableName} (ClosingBalanceDomainCompany, CreatedDate, ModifiedDate, ClosingBalance) " \
+        sql = f"INSERT INTO {CLOSINGBALANCETABLENAME} (ClosingBalanceDomainCompany, CreatedDate, ModifiedDate, ClosingBalance) " \
               f"VALUES (?, ?, ?, ?)"
 
 # Prepare the values for the parameters
@@ -328,6 +335,7 @@ def update_sql_table_for_classified(pdf_based_file_preprocessed_data, server, da
 
     # Return the list of IDs that were updated
     return ids_to_update
+
 def save_dataframe_to_blob(dataframe, connection_string, container_name, excel_file_name):
     # Save DataFrame to Excel file
     report_file = BytesIO()
@@ -393,29 +401,21 @@ def main(myblob: func.InputStream):
     logging.info(f"Blob trigger function processed blob \n"
                  f"Name: {myblob.name}\n"
                  f"Blob Size: {myblob.length} bytes")  
+
     
-    template_file_path = "https://arunakcs.blob.core.windows.net/excelfiles/main_template/test_template.xlsx"
-    df_template = pd.read_excel(template_file_path)
+    df_template = pd.read_excel(TEMPLATEFILEPATH)
     #df_reference = pd.read_excel(template_file_path, sheet_name="term_references")
     logging.info(df_template.columns)
-
-    server = "akcserver.database.windows.net"
-    database = "dbarunsql"
-    username = "Arun" 
-    password = "Asds@2022"
-    table_name = "TransactionDetails"
-    connection_string = "DefaultEndpointsProtocol=https;AccountName=arunakcs;AccountKey=nx8T5960W1vcaeHKOD/4HtiCm0/n58VXhtsNAp7LoyDdZX6IdRPsomJsBoOgB72wPd9AHfwwcoFo+AStndZq2Q==;EndpointSuffix=core.windows.net"    
-    blob_service_client = BlobServiceClient.from_connection_string(connection_string)
-    container_name = 'functionapp-pdf'
-    container_client = blob_service_client.get_container_client(container_name)
+    blob_service_client = BlobServiceClient.from_connection_string(CONNECTIONSTRING)
+    container_client = blob_service_client.get_container_client(CONTAINERNAME)
     blobs = container_client.list_blobs()
     latest_blob = max(blobs, key=lambda blob: blob.last_modified)
     latest_blob_name = latest_blob.name
     input_file = latest_blob_name
     try:
         
-        df_input_bank_statement_from_sql = fetch_data_from_sql(server, database, username, password, table_name)
-        logging.info(f"Data has been fetched from {database} and the table {table_name}")
+        df_input_bank_statement_from_sql = fetch_data_from_sql(SERVER, DATABASE, USERNAME, PASSWORD, TRANSACTIONDETAILSTABLENAME)
+        logging.info(f"Data has been fetched from {DATABASE} and the table {TRANSACTIONDETAILSTABLENAME}")
         logging.info(f"{len(df_input_bank_statement_from_sql)}")
         
         df_input_bank_statement = read_user_input_data(input_file,df_input_bank_statement_from_sql)
@@ -429,7 +429,7 @@ def main(myblob: func.InputStream):
         
         report_template = preprocess_template_data(df_template)
         logging.info(f"report template")
-        nlp_bank_transactions, model_weights, vectorizer_weights = load_nlp_models(connection_string, pdf_based_file_preprocessed_data)
+        nlp_bank_transactions, model_weights, vectorizer_weights = load_nlp_models(CONNECTIONSTRING, pdf_based_file_preprocessed_data)
         
         logging.info("Predictiing using Model path")
         predictions = predict_transactions(nlp_bank_transactions, model_weights, vectorizer_weights)
@@ -437,17 +437,15 @@ def main(myblob: func.InputStream):
         pdf_based_file_preprocessed_data['Prediction'] = predictions
         
         #fetching unclassified data and saving it in DB
-        insert_data_into_training_table(server, database, username, password, pdf_based_file_preprocessed_data)
+        insert_data_into_training_table(SERVER, DATABASE, USERNAME, PASSWORD, pdf_based_file_preprocessed_data)
         
-        update_sql_table_for_classified(pdf_based_file_preprocessed_data, server, database, username, password, table_name)
+        update_sql_table_for_classified(pdf_based_file_preprocessed_data, SERVER, DATABASE, USERNAME, PASSWORD, TRANSACTIONDETAILSTABLENAME)
         
-        populate_report_template = populate_final_report(report_template, pdf_based_file_preprocessed_data, input_file)
+        populate_report_template = populate_final_report(report_template, pdf_based_file_preprocessed_data, input_file, SERVER, DATABASE, USERNAME, PASSWORD)
         
-        now_date = datetime.now()
-        container_name = "outputreport"
-        excel_file_name = f"output_report_{now_date.date()}_{now_date.minute}_{now_date.second}.xlsx"
+        excel_file_name = f"output_report_{DATENOW.date()}_{DATENOW.minute}_{DATENOW.second}.xlsx"
         
-        save_dataframe_to_blob(populate_report_template,connection_string, container_name, excel_file_name)
+        save_dataframe_to_blob(populate_report_template,CONNECTIONSTRING, OUTPUTREPORTCONTIAINERNAME, excel_file_name)
 
     except Exception as e:
         logging.error(e)
