@@ -24,6 +24,9 @@ CONTAINERNAME = os.environ['AkcsTriggerContainerName']
 TEMPLATEFILEPATH = os.environ["AkcsTemplate_file_path"]
 OUTPUTREPORTCONTIAINERNAME = os.environ["Akcsoutputreport_container_name"]
 DATENOW = datetime.now()
+AIMODELCONTAINERNAME = os.environ["AkcsAiModelContainerName"]
+AKCSAINLPMODELNAME = os.environ["AkcsNlpPklFileModelName"]
+AKCSAIVECTORIZERMODELNAME = os.environ["AkcsAiVectorizerModelNamePklFile"]
 
 def read_user_input_data(input_file, df_input):
     current_datetime = datetime.now()
@@ -359,15 +362,15 @@ def load_nlp_models(connection_string, data_frame):
 
     # Load the NLP models from Azure Storage
     blob_service_client = BlobServiceClient.from_connection_string(connection_string)
-    container_client = blob_service_client.get_container_client("akcsaiamodel")
+    container_client = blob_service_client.get_container_client(AIMODELCONTAINERNAME)
 
     # Download the model blob
-    model_blob_client = container_client.get_blob_client("AkcsNlpCustommodel_V1.pkl")
+    model_blob_client = container_client.get_blob_client(AKCSAINLPMODELNAME)
     model_blob_data = model_blob_client.download_blob().readall()
     model_weights = pickle.loads(model_blob_data)
 
     # Download the vectorizer blob
-    vectorizer_blob_client = container_client.get_blob_client("Vectorizer_V1.pkl")
+    vectorizer_blob_client = container_client.get_blob_client(AKCSAIVECTORIZERMODELNAME)
     vectorizer_blob_data = vectorizer_blob_client.download_blob().readall()
     vectorizer_weights = pickle.loads(vectorizer_blob_data)
 
