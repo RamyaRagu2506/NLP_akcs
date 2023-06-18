@@ -296,7 +296,7 @@ def populate_final_report(report_template, nlp_classified_df, input_file_path):
         conn.close
         return report_template
 
-def update_sql_table(pdf_based_file_preprocessed_data, server, database, username, password, table_name):
+def update_sql_table_for_classified(pdf_based_file_preprocessed_data, server, database, username, password, table_name):
     # Load the dataframe from Azure SQL or any other data source
     # For the purpose of this example, let's assume the dataframe is already loaded
     # into a variable named "pdf_based_file_preprocessed_data"
@@ -343,6 +343,50 @@ def save_dataframe_to_blob(dataframe, connection_string, container_name, excel_f
     
     blob_client.upload_blob(report_file, overwrite=True, content_settings=ContentSettings(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'))
 
+def load_nlp_models(connection_string, data_frame):
+    # Remove rows with null values in the 'Narration' column
+    nlp_classified = data_frame.dropna(subset=['Narration'])
+    nlp_classified_data_without_nulls = nlp_classified.dropna(subset=['Narration'])
+    nlp_bank_transactions = nlp_classified_data_without_nulls['Narration']
+
+    # Load the NLP models from Azure Storage
+    blob_service_client = BlobServiceClient.from_connection_string(connection_string)
+    container_client = blob_service_client.get_container_client("akcsaiamodel")
+
+    # Download the model blob
+    model_blob_client = container_client.get_blob_client("AkcsNlpCustommodel_V1.pkl")
+    model_blob_data = model_blob_client.download_blob().readall()
+    model_weights = pickle.loads(model_blob_data)
+
+    # Download the vectorizer blob
+    vectorizer_blob_client = container_client.get_blob_client("Vectorizer_V1.pkl")
+    vectorizer_blob_data = vectorizer_blob_client.download_blob().readall()
+    vectorizer_weights = pickle.loads(vectorizer_blob_data)
+
+    return nlp_bank_transactions, model_weights, vectorizer_weights
+
+def insert_data_into_training_table(server, database, username, password, pdf_based_file_preprocessed_data):
+    
+    conn_str = f"DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password}"
+    unclassified_df = pdf_based_file_preprocessed_data[['Narration','Prediction']]
+    conn = pyodbc.connect(conn_str)
+    unclassifiedDatatable = "TrainingDataBankStatements"
+    cursor = conn.cursor()
+    sql = f"INSERT INTO {unclassifiedDatatable} (Narration, Label, CreatedDate) " \
+              f"VALUES (?, ?, ?)"
+
+# Prepare the values for the parameters
+    params = []
+    for index, row in unclassified_df.iterrows():
+        narration = row['Narration']
+        prediction = row['Prediction']
+        created_date = datetime.now()
+        params.append((narration, prediction, created_date))
+
+# Execute the SQL statement with the parameters
+    cursor.executemany(sql, params)
+    conn.commit()
+    conn.close
 
 def main(myblob: func.InputStream):
     
@@ -352,7 +396,7 @@ def main(myblob: func.InputStream):
     
     template_file_path = "https://arunakcs.blob.core.windows.net/excelfiles/main_template/test_template.xlsx"
     df_template = pd.read_excel(template_file_path)
-    df_reference = pd.read_excel(template_file_path, sheet_name="term_references")
+    #df_reference = pd.read_excel(template_file_path, sheet_name="term_references")
     logging.info(df_template.columns)
 
     server = "akcserver.database.windows.net"
@@ -385,46 +429,17 @@ def main(myblob: func.InputStream):
         
         report_template = preprocess_template_data(df_template)
         logging.info(f"report template")
-        
-        nlp_classified = pdf_based_file_preprocessed_data.dropna(subset=['Narration'])
-        nlp_classified_data_without_nulls = nlp_classified.dropna(subset=['Narration'])
-        nlp_bank_transactions = nlp_classified_data_without_nulls['Narration']
-        
-        aiblob_service_client = BlobServiceClient.from_connection_string(connection_string)
-        aicontainer_client = aiblob_service_client.get_container_client("akcsaiamodel")
-        aiblob_client_akcsmodel = aicontainer_client.get_blob_client("AkcsNlpCustommodel_V1.pkl")
-        aiblob_data_akcsmodel = aiblob_client_akcsmodel.download_blob().readall()
-        model_weights = pickle.loads(aiblob_data_akcsmodel)
-        
-        aiblob_client_vecmodel = aicontainer_client.get_blob_client("Vectorizer_V1.pkl")
-        aiblob_data_vecmodel = aiblob_client_vecmodel.download_blob().readall()
-        vectorizer_weights = pickle.loads(aiblob_data_vecmodel)
+        nlp_bank_transactions, model_weights, vectorizer_weights = load_nlp_models(connection_string, pdf_based_file_preprocessed_data)
         
         logging.info("Predictiing using Model path")
         predictions = predict_transactions(nlp_bank_transactions, model_weights, vectorizer_weights)
 
         pdf_based_file_preprocessed_data['Prediction'] = predictions
         
-        update_sql_table(pdf_based_file_preprocessed_data, server, database, username, password, table_name)
-    #     condition = (pdf_based_file_preprocessed_data['Classified'] == 'No')
-    
-    #     filtered_df = pdf_based_file_preprocessed_data.loc[condition]
-    #     ids_to_update = filtered_df['TransactionId'].tolist()
-
-    #     conn_str = f"DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password}"    
-    #     conn = pyodbc.connect(conn_str)
-    #     cursor = conn.cursor()
-
-    # # Update the SQL table for each ID
-    #     print(ids_to_update)
-    #     for id_to_update in ids_to_update:
-    #         update_query = f"UPDATE {table_name} SET Classified = 'Yes' WHERE TransactionId = {id_to_update}"
-    #         cursor.execute(update_query)
-
-    # # Commit the changes and close the connection
-    #     conn.commit()
-    #     conn.close()
+        #fetching unclassified data and saving it in DB
+        insert_data_into_training_table(server, database, username, password, pdf_based_file_preprocessed_data)
         
+        update_sql_table_for_classified(pdf_based_file_preprocessed_data, server, database, username, password, table_name)
         
         populate_report_template = populate_final_report(report_template, pdf_based_file_preprocessed_data, input_file)
         
