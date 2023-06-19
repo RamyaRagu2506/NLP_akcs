@@ -270,10 +270,10 @@ def populate_final_report(report_template, nlp_classified_df, input_file_path, s
             debit_sum = filtered_df['Debit'].sum()
             credit_sum = filtered_df['Credit'].sum()
             total_sum = credit_sum + (-debit_sum)
-            report_template.loc[report_template['Description'] == description, 'Emirates-NBD-Classic-Passenger'] = total_sum
+            report_template.loc[report_template['Description'] == description, 'Emirates NBD-Classic Passenger'] = total_sum
         closingBalance = report_template['Emirates NBD-Classic Passenger'][1:12].sum()
         report_template.loc[report_template['Description'] == 'Opening Balance', 'Emirates NBD-Classic Passenger'] = openingBalance
-        report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'Emirates-NBD-Classic-Passenger'] = report_template['Emirates-NBD-Classic-Passenger'][1:12].sum()
+        report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'Emirates NBD-Classic Passenger'] = report_template['Emirates-NBD-Classic-Passenger'][1:12].sum()
         cursor = conn.cursor()
         sql = f"INSERT INTO {CLOSINGBALANCETABLENAME} (ClosingBalanceDomainCompany, CreatedDate, ModifiedDate, ClosingBalance) " \
               f"VALUES (?, ?, ?, ?)"
@@ -437,16 +437,15 @@ def main(myblob: func.InputStream):
         logging.info(f"report template")
         nlp_bank_transactions, model_weights, vectorizer_weights = load_nlp_models(CONNECTIONSTRING, pdf_based_file_preprocessed_data)
         
-        logging.info("Predictiing using Model path")
-        predictions = predict_transactions(nlp_bank_transactions, model_weights, vectorizer_weights)
-
-        pdf_based_file_preprocessed_data['Prediction'] = predictions
-        
-        #fetching unclassified data and saving it in DB
-        insert_data_into_training_table(SERVER, DATABASE, USERNAME, PASSWORD, pdf_based_file_preprocessed_data)
+        if len(nlp_bank_transactions) > 0:
+            
+            logging.info("Predictiing using Model path")
+            predictions = predict_transactions(nlp_bank_transactions, model_weights, vectorizer_weights)
+            pdf_based_file_preprocessed_data['Prediction'] = predictions
+              #fetching unclassified data and saving it in DB
+            insert_data_into_training_table(SERVER, DATABASE, USERNAME, PASSWORD, pdf_based_file_preprocessed_data)
         
         update_sql_table_for_classified(pdf_based_file_preprocessed_data, SERVER, DATABASE, USERNAME, PASSWORD, TRANSACTIONDETAILSTABLENAME)
-        
         populate_report_template = populate_final_report(report_template, pdf_based_file_preprocessed_data, input_file, SERVER, DATABASE, USERNAME, PASSWORD)
         
         excel_file_name = f"output_report_{DATENOW.date()}_{DATENOW.minute}_{DATENOW.second}.xlsx"
