@@ -9,7 +9,7 @@ import pickle
 from io import BytesIO
 
 #Global Variables declared
-CLOSINGBALANCETABLENAME = os.environ["AkcsCLOSINGBALANCETABLENAME"]
+CLOSINGBALANCETABLENAME = os.environ["AkcsclosingbalanceTableName"]
 SERVER = os.environ["AkcsServer"]
 DATABASE = os.environ["AkcsDatabase"]
 USERNAME = os.environ["AkcsDBUsername"] 
@@ -72,7 +72,7 @@ def read_user_input_data(input_file, df_input):
     
     else: 
         logging.info(f'{input_file} Does not exist.')
-        
+
 def general_preprocess(input_df):
     if input_df['TransactionDate'].isnull().sum() > 0:
         dropped_df = input_df['TransactionDate'].dropna()
