@@ -38,15 +38,18 @@ def read_user_input_data(input_file, df_input):
     
     if 'Emirates-NBD-Classic-Luxury-Main' in input_file:
         nbd_df = df_input[df_input['DomainName']=='Emirates-NBD-Classic-Luxury-Main']  
+        logging.info(f"{nbd_df['DomainName'].value_counts()}")
         logging.info(f"{len(nbd_df)}")
         return nbd_df
     
     elif 'Rak-Bank-Classic-Luxury' in input_file:
         clt_rak_df = df_input[df_input['DomainName']=='Rak-Bank-Classic-Luxury']
+        logging.info(f"{clt_rak_df['DomainName'].value_counts()}")
         return clt_rak_df
     
     elif 'CLT-ADCB' in input_file:
         clt_adcb_df = df_input[df_input['DomainName']=='CLT-ADCB']
+        logging.info(f"{clt_adcb_df['DomainName'].value_counts()}")
         return clt_adcb_df
     
     elif 'CBD-Bank' in input_file:
@@ -55,19 +58,23 @@ def read_user_input_data(input_file, df_input):
     
     elif 'EIB-Loan-account' in input_file:
         cbd_df = df_input[df_input['DomainName']=='EIB-Loan account']
+        logging.info(f"{cbd_df['DomainName'].value_counts()}")
         return cbd_df
     
     elif 'OLT-Emirates-Islamic-Bank' in input_file:
         cbd_df = df_input[df_input['DomainName']=='OLT-Emirates-Islamic-Bank']
+        logging.info(f"{cbd_df['DomainName'].value_counts()}")
         return cbd_df
 
     
     elif 'Emirates-NBD-Classic-Passenger' in input_file:
         emirates_nbd_classic_passenger_df= df_input[df_input['DomainName']=='Emirates-NBD-Classic-Passenger']
+        logging.info(f"{emirates_nbd_classic_passenger_df['DomainName'].value_counts()}")
         return emirates_nbd_classic_passenger_df
     
     elif 'ENBD-Classic-Riders' in input_file:
         enbd_classic_riders_df = df_input[df_input['DomainName']=='ENBD-Classic-Riders']
+        logging.info(f"{enbd_classic_riders_df['DomainName'].value_counts()}")
         return enbd_classic_riders_df
     
     else: 
@@ -448,8 +455,40 @@ def main(myblob: func.InputStream):
         update_sql_table_for_classified(pdf_based_file_preprocessed_data, SERVER, DATABASE, USERNAME, PASSWORD, TRANSACTIONDETAILSTABLENAME)
         populate_report_template = populate_final_report(report_template, pdf_based_file_preprocessed_data, input_file, SERVER, DATABASE, USERNAME, PASSWORD)
         
-        excel_file_name = f"output_report_{DATENOW.date()}_{DATENOW.minute}_{DATENOW.second}.xlsx"
         
+        
+        
+        if 'Emirates-NBD-Classic-Luxury-Main' in input_file:
+            file_name_xl='Emirates-NBD-Classic-Luxury-Main'  
+            
+            
+        elif 'Rak-Bank-Classic-Luxury' in input_file:
+            file_name_xl='Rak-Bank-Classic-Luxury'
+            
+        elif 'CLT-ADCB' in input_file:
+            file_name_xl='CLT-ADCB'
+            
+        elif 'CBD-Bank' in input_file:
+            file_name_xl='CBD-Bank'
+            
+        elif 'EIB-Loan-account' in input_file:
+            file_name_xl='EIB-Loan-account'
+            
+        elif 'OLT-Emirates-Islamic-Bank' in input_file:
+            file_name_xl='OLT-Emirates-Islamic-Bank'
+            
+    
+        elif 'Emirates-NBD-Classic-Passenger' in input_file:
+            file_name_xl='Emirates-NBD-Classic-Passenger'
+            
+        elif 'ENBD-Classic-Riders' in input_file:
+            file_name_xl='ENBD-Classic-Riders'
+    
+        else: 
+            logging.info(f'{input_file} Does not exist.')
+        
+        excel_file_name = f"Report_for_{DATENOW.date()}_{DATENOW.month}_{DATENOW.day}_{DATENOW.hour}_{DATENOW.minute}_{DATENOW.second}_{file_name_xl}.xlsx"
+        logging.info(f"{excel_file_name}")
         save_dataframe_to_blob(populate_report_template,CONNECTIONSTRING, OUTPUTREPORTCONTIAINERNAME, excel_file_name)
 
     except Exception as e:
