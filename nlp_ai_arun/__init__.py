@@ -233,8 +233,8 @@ def populate_final_report(report_template, nlp_classified_df, input_file_path, s
             credit_sum = filtered_df['Credit'].sum()
             total_sum = credit_sum + (-debit_sum)
             report_template.loc[report_template['Description'] == description, 'EIB-Loan account'] = total_sum
-        closingBalance = report_template['EIB-Loan account'][1:12].sum()
         report_template.loc[report_template['Description'] == 'Opening Balance', 'EIB-Loan account'] = openingBalance
+        closingBalance = report_template['EIB-Loan account'][1:12].sum()
         report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'EIB-Loan account'] = report_template['EIB-Loan account'][1:12].sum()
         cursor = conn.cursor()
         sql = f"INSERT INTO {CLOSINGBALANCETABLENAME} (ClosingBalanceDomainCompany, CreatedDate, ModifiedDate, ClosingBalance) " \
@@ -256,8 +256,8 @@ def populate_final_report(report_template, nlp_classified_df, input_file_path, s
             credit_sum = filtered_df['Credit'].sum()
             total_sum = credit_sum + (-debit_sum)
             report_template.loc[report_template['Description'] == description, 'OLT - Emirates Islamic Bank'] = total_sum
-        closingBalance = report_template['OLT - Emirates Islamic Bank'][1:12].sum()
         report_template.loc[report_template['Description'] == 'Opening Balance', 'OLT - Emirates Islamic Bank'] = openingBalance
+        closingBalance = report_template['OLT - Emirates Islamic Bank'][1:12].sum()
         report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'OLT - Emirates Islamic Bank'] = report_template['OLT - Emirates Islamic Bank'][1:12].sum()
         cursor = conn.cursor()
         sql = f"INSERT INTO {CLOSINGBALANCETABLENAME} (ClosingBalanceDomainCompany, CreatedDate, ModifiedDate, ClosingBalance) " \
@@ -485,6 +485,7 @@ def main(myblob: func.InputStream):
             file_name_xl='ENBD-Classic-Riders'
     
         else: 
+            file_name_xl = "new_file"
             logging.info(f'{input_file} Does not exist.')
         
         excel_file_name = f"Report_for_{DATENOW.date()}_{DATENOW.month}_{DATENOW.day}_{DATENOW.hour}_{DATENOW.minute}_{DATENOW.second}_{file_name_xl}.xlsx"
