@@ -498,5 +498,6 @@ def main(myblob: func.InputStream):
         save_dataframe_to_blob(populate_report_template,CONNECTIONSTRING, OUTPUTREPORTCONTIAINERNAME, excel_file_name)
 
     except Exception as e:
+        logging.info(f"{e}")
         logging.error(e)
     
