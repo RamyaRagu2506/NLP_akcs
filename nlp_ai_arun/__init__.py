@@ -462,11 +462,10 @@ def main(myblob: func.InputStream):
         update_sql_table_for_classified(pdf_based_file_preprocessed_data, SERVER, DATABASE, USERNAME, PASSWORD, TRANSACTIONDETAILSTABLENAME)
         populate_report_template = populate_final_report(report_template, pdf_based_file_preprocessed_data, input_file, SERVER, DATABASE, USERNAME, PASSWORD)
         
-        
+        logging.info(f"{input_file}")
         if 'Emirates-NBD-Classic-Luxury-Main' in input_file:
             file_name_xl='Emirates-NBD-Classic-Luxury-Main'  
             logging.info(f"{file_name_xl}")    
-            
         elif 'Rak-Bank-Classic-Luxury' in input_file:
             file_name_xl='Rak-Bank-Classic-Luxury'
             logging.info(f"{file_name_xl}")
@@ -482,7 +481,7 @@ def main(myblob: func.InputStream):
         elif 'OLT-Emirates-Islamic-Bank' in input_file:
             file_name_xl='OLT-Emirates-Islamic-Bank'
             logging.info(f"{file_name_xl}")
-        elif 'Emirates-NBD-Classic-Passenger' in input_file:
+        elif "Emirates-NBD-Classic-Passenger" in input_file:
             file_name_xl='Emirates-NBD-Classic-Passenger'
             logging.info(f"{file_name_xl}")
         elif 'ENBD-Classic-Riders' in input_file:
@@ -498,5 +497,6 @@ def main(myblob: func.InputStream):
         save_dataframe_to_blob(populate_report_template,CONNECTIONSTRING, OUTPUTREPORTCONTIAINERNAME, excel_file_name)
 
     except Exception as e:
+        logging.info(f"{e}")
         logging.error(e)
     
