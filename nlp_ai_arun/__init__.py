@@ -138,9 +138,9 @@ def populate_final_report(report_template, nlp_classified_df, input_file_path, s
             credit_sum = filtered_df['Credit'].sum()
             total_sum = credit_sum + (-debit_sum)
             report_template.loc[report_template['Description'] == description, 'Emirates NBD-Classic Luxury-Main'] = total_sum
+        report_template.loc[report_template['Description'] == 'Opening Balance', 'Emirates NBD-Classic Luxury-Main'] = openingBalance
         closingBalance = report_template['Emirates NBD-Classic Luxury-Main'][1:12].sum()
         report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'Emirates NBD-Classic Luxury-Main'] = report_template['Emirates NBD-Classic Luxury-Main'][1:12].sum()
-        report_template.loc[report_template['Description'] == 'Opening Balance', 'Emirates NBD-Classic Luxury-Main'] = openingBalance
         logging.info(f"{report_template['Emirates NBD-Classic Luxury-Main']}")
         cursor = conn.cursor()
         sql = f"INSERT INTO {CLOSINGBALANCETABLENAME} (ClosingBalanceDomainCompany, CreatedDate, ModifiedDate, ClosingBalance) " \
@@ -163,8 +163,8 @@ def populate_final_report(report_template, nlp_classified_df, input_file_path, s
             credit_sum = filtered_df['Credit'].sum()
             total_sum = credit_sum + (-debit_sum)
             report_template.loc[report_template['Description'] == description, 'CBD Bank'] = total_sum
-        closingBalance = report_template['CBD Bank'][1:12].sum()
         report_template.loc[report_template['Description'] == 'Opening Balance', 'CBD Bank'] = openingBalance
+        closingBalance = report_template['CBD Bank'][1:12].sum()
         report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'CBD Bank'] = report_template['CBD Bank'][1:12].sum()
         cursor = conn.cursor()
         sql = f"INSERT INTO {CLOSINGBALANCETABLENAME} (ClosingBalanceDomainCompany, CreatedDate, ModifiedDate, ClosingBalance) " \
@@ -187,8 +187,8 @@ def populate_final_report(report_template, nlp_classified_df, input_file_path, s
             credit_sum = filtered_df['Credit'].sum()
             total_sum = credit_sum + (-debit_sum)
             report_template.loc[report_template['Description'] == description, 'Rak Bank-Classic Luxury'] = total_sum
-        closingBalance = report_template['Rak Bank-Classic Luxury'][1:12].sum()
         report_template.loc[report_template['Description'] == 'Opening Balance', 'Rak Bank-Classic Luxury'] = openingBalance
+        closingBalance = report_template['Rak Bank-Classic Luxury'][1:12].sum()
         report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'Rak Bank-Classic Luxury'] = report_template['Rak Bank-Classic Luxury'][1:12].sum()
         cursor = conn.cursor()
         sql = f"INSERT INTO {CLOSINGBALANCETABLENAME} (ClosingBalanceDomainCompany, CreatedDate, ModifiedDate, ClosingBalance) " \
@@ -210,8 +210,8 @@ def populate_final_report(report_template, nlp_classified_df, input_file_path, s
             credit_sum = filtered_df['Credit'].sum()
             total_sum = credit_sum + (-debit_sum)
             report_template.loc[report_template['Description'] == description, 'CLT-ADCB'] = total_sum
-        closingBalance = report_template['CLT-ADCB'][1:12].sum()
         report_template.loc[report_template['Description'] == 'Opening Balance', 'CLT-ADCB'] = openingBalance
+        closingBalance = report_template['CLT-ADCB'][1:12].sum()
         report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'CLT-ADCB'] = report_template['CLT-ADCB'][1:12].sum()
         cursor = conn.cursor()
         sql = f"INSERT INTO {CLOSINGBALANCETABLENAME} (ClosingBalanceDomainCompany, CreatedDate, ModifiedDate, ClosingBalance) " \
@@ -233,8 +233,8 @@ def populate_final_report(report_template, nlp_classified_df, input_file_path, s
             credit_sum = filtered_df['Credit'].sum()
             total_sum = credit_sum + (-debit_sum)
             report_template.loc[report_template['Description'] == description, 'EIB-Loan account'] = total_sum
-        closingBalance = report_template['EIB-Loan account'][1:12].sum()
         report_template.loc[report_template['Description'] == 'Opening Balance', 'EIB-Loan account'] = openingBalance
+        closingBalance = report_template['EIB-Loan account'][1:12].sum()
         report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'EIB-Loan account'] = report_template['EIB-Loan account'][1:12].sum()
         cursor = conn.cursor()
         sql = f"INSERT INTO {CLOSINGBALANCETABLENAME} (ClosingBalanceDomainCompany, CreatedDate, ModifiedDate, ClosingBalance) " \
@@ -256,8 +256,8 @@ def populate_final_report(report_template, nlp_classified_df, input_file_path, s
             credit_sum = filtered_df['Credit'].sum()
             total_sum = credit_sum + (-debit_sum)
             report_template.loc[report_template['Description'] == description, 'OLT - Emirates Islamic Bank'] = total_sum
-        closingBalance = report_template['OLT - Emirates Islamic Bank'][1:12].sum()
         report_template.loc[report_template['Description'] == 'Opening Balance', 'OLT - Emirates Islamic Bank'] = openingBalance
+        closingBalance = report_template['OLT - Emirates Islamic Bank'][1:12].sum()
         report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'OLT - Emirates Islamic Bank'] = report_template['OLT - Emirates Islamic Bank'][1:12].sum()
         cursor = conn.cursor()
         sql = f"INSERT INTO {CLOSINGBALANCETABLENAME} (ClosingBalanceDomainCompany, CreatedDate, ModifiedDate, ClosingBalance) " \
@@ -278,8 +278,8 @@ def populate_final_report(report_template, nlp_classified_df, input_file_path, s
             credit_sum = filtered_df['Credit'].sum()
             total_sum = credit_sum + (-debit_sum)
             report_template.loc[report_template['Description'] == description, 'Emirates NBD-Classic Passenger'] = total_sum
-        closingBalance = report_template['Emirates NBD-Classic Passenger'][1:12].sum()
         report_template.loc[report_template['Description'] == 'Opening Balance', 'Emirates NBD-Classic Passenger'] = openingBalance
+        closingBalance = report_template['Emirates NBD-Classic Passenger'][1:12].sum()
         report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'Emirates NBD-Classic Passenger'] = report_template['Emirates-NBD-Classic-Passenger'][1:12].sum()
         cursor = conn.cursor()
         sql = f"INSERT INTO {CLOSINGBALANCETABLENAME} (ClosingBalanceDomainCompany, CreatedDate, ModifiedDate, ClosingBalance) " \
@@ -300,8 +300,8 @@ def populate_final_report(report_template, nlp_classified_df, input_file_path, s
             credit_sum = filtered_df['Credit'].sum()
             total_sum = credit_sum + (-debit_sum)
             report_template.loc[report_template['Description'] == description, 'OENBD - Classic Riders'] = total_sum
-        closingBalance = report_template['ENBD - Classic Riders'][1:12].sum()
         report_template.loc[report_template['Description'] == 'Opening Balance', 'ENBD - Classic Riders'] = openingBalance
+        closingBalance = report_template['ENBD - Classic Riders'][1:12].sum()
         report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'ENBD - Classic Riders'] = report_template['ENBD - Classic Riders'][1:12].sum() 
         cursor = conn.cursor()
         sql = f"INSERT INTO {CLOSINGBALANCETABLENAME} (ClosingBalanceDomainCompany, CreatedDate, ModifiedDate, ClosingBalance) " \
@@ -456,37 +456,36 @@ def main(myblob: func.InputStream):
         populate_report_template = populate_final_report(report_template, pdf_based_file_preprocessed_data, input_file, SERVER, DATABASE, USERNAME, PASSWORD)
         
         
-        
-        
         if 'Emirates-NBD-Classic-Luxury-Main' in input_file:
             file_name_xl='Emirates-NBD-Classic-Luxury-Main'  
-            
+            logging.info(f"{file_name_xl}")    
             
         elif 'Rak-Bank-Classic-Luxury' in input_file:
             file_name_xl='Rak-Bank-Classic-Luxury'
-            
+            logging.info(f"{file_name_xl}")
         elif 'CLT-ADCB' in input_file:
             file_name_xl='CLT-ADCB'
-            
+            logging.info(f"{file_name_xl}")
         elif 'CBD-Bank' in input_file:
             file_name_xl='CBD-Bank'
-            
+            logging.info(f"{file_name_xl}")
         elif 'EIB-Loan-account' in input_file:
             file_name_xl='EIB-Loan-account'
-            
+            logging.info(f"{file_name_xl}")
         elif 'OLT-Emirates-Islamic-Bank' in input_file:
             file_name_xl='OLT-Emirates-Islamic-Bank'
-            
-    
+            logging.info(f"{file_name_xl}")
         elif 'Emirates-NBD-Classic-Passenger' in input_file:
             file_name_xl='Emirates-NBD-Classic-Passenger'
-            
+            logging.info(f"{file_name_xl}")
         elif 'ENBD-Classic-Riders' in input_file:
             file_name_xl='ENBD-Classic-Riders'
-    
+            logging.info(f"{file_name_xl}")
         else: 
+            file_name_xl = "new_file"
             logging.info(f'{input_file} Does not exist.')
-        
+            logging.info(f"{file_name_xl}")
+            
         excel_file_name = f"Report_for_{DATENOW.date()}_{DATENOW.month}_{DATENOW.day}_{DATENOW.hour}_{DATENOW.minute}_{DATENOW.second}_{file_name_xl}.xlsx"
         logging.info(f"{excel_file_name}")
         save_dataframe_to_blob(populate_report_template,CONNECTIONSTRING, OUTPUTREPORTCONTIAINERNAME, excel_file_name)
