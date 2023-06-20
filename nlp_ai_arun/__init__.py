@@ -122,6 +122,7 @@ def fetch_data_from_sql(server, database, username, password, table_name):
     return df
 
 def populate_final_report(report_template, nlp_classified_df, input_file_path, server, database, username, password):
+    logging.info(f"{input_file_path}")
     
     conn_str = f"DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password}"
     conn = pyodbc.connect(conn_str)
@@ -272,11 +273,17 @@ def populate_final_report(report_template, nlp_classified_df, input_file_path, s
         conn.close
         return report_template
     elif 'Emirates-NBD-Classic-Passenger' in input_file_path:
+        logging.info(f"{input_file_path}")
         for description in report_template['Description']:
+            logging.info(f"{description}")
             filtered_df = nlp_classified_df[nlp_classified_df['Prediction'] == description]
+            
             debit_sum = filtered_df['Debit'].sum()
+            logging.info(f"{debit_sum}")
             credit_sum = filtered_df['Credit'].sum()
+            logging.info(f"{credit_sum}")
             total_sum = credit_sum + (-debit_sum)
+            logging.info(f"{total_sum}")
             report_template.loc[report_template['Description'] == description, 'Emirates NBD-Classic Passenger'] = total_sum
         report_template.loc[report_template['Description'] == 'Opening Balance', 'Emirates NBD-Classic Passenger'] = openingBalance
         closingBalance = report_template['Emirates NBD-Classic Passenger'][1:12].sum()
