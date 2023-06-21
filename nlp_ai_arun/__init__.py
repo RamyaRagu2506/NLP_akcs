@@ -496,7 +496,14 @@ def main(myblob: func.InputStream):
         logging.info(f"{excel_file_name}")
         save_dataframe_to_blob(populate_report_template,CONNECTIONSTRING, OUTPUTREPORTCONTIAINERNAME, excel_file_name)
 
+    except FileNotFoundError as e:
+        logging.error(f"File not found: {e.filename}")
+    # Handle the specific exception for FileNotFoundError
+
+    except ValueError as e:
+        logging.error(f"Invalid value: {e}")
+    # Handle the specific exception for ValueError
+
     except Exception as e:
-        logging.info(f"{e}")
-        logging.error(e)
+        logging.error(f"An unexpected error occurred: {e}")
     
