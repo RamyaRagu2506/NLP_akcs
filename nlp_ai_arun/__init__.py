@@ -481,7 +481,7 @@ def main(myblob: func.InputStream):
         elif 'OLT-Emirates-Islamic-Bank' in input_file:
             file_name_xl='OLT-Emirates-Islamic-Bank'
             logging.info(f"{file_name_xl}")
-        elif "Emirates-NBD-Classic-Passenger" in input_file:
+        elif 'Emirates-NBD-Classic-Passenger' in input_file:
             file_name_xl='Emirates-NBD-Classic-Passenger'
             logging.info(f"{file_name_xl}")
         elif 'ENBD-Classic-Riders' in input_file:
@@ -498,12 +498,23 @@ def main(myblob: func.InputStream):
 
     except FileNotFoundError as e:
         logging.error(f"File not found: {e.filename}")
-    # Handle the specific exception for FileNotFoundError
 
     except ValueError as e:
         logging.error(f"Invalid value: {e}")
-    # Handle the specific exception for ValueError
 
     except Exception as e:
-        logging.error(f"An unexpected error occurred: {e}")
+        if str(e) == "'Emirates-NBD-Classic-Passenger'":
+            logging.error("Unexpected value for 'Emirates-NBD-Classic-Passenger'")
+            excel_file_name = f"Report_for_{DATENOW.date()}_{DATENOW.month}_{DATENOW.day}_{DATENOW.hour}_{DATENOW.minute}_{DATENOW.second}_{file_name_xl}.xlsx"
+            logging.info(f"{excel_file_name}")
+            save_dataframe_to_blob(populate_report_template,CONNECTIONSTRING, OUTPUTREPORTCONTIAINERNAME, excel_file_name)
+
+        # Handle the specific error for 'Emirates-NBD-Classic-Passenger'
+        else:
+            logging.error(f"An unexpected error occurred: {e}")
+            excel_file_name = f"Report_for_{DATENOW.date()}_{DATENOW.month}_{DATENOW.day}_{DATENOW.hour}_{DATENOW.minute}_{DATENOW.second}_{file_name_xl}.xlsx"
+            logging.info(f"{excel_file_name}")
+            save_dataframe_to_blob(populate_report_template,CONNECTIONSTRING, OUTPUTREPORTCONTIAINERNAME, excel_file_name)
+
+        # Handle any other type of exception
     
