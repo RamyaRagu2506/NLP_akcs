@@ -462,44 +462,8 @@ def main(myblob: func.InputStream):
         
         update_sql_table_for_classified(pdf_based_file_preprocessed_data, SERVER, DATABASE, USERNAME, PASSWORD, TRANSACTIONDETAILSTABLENAME)
         populate_report_template = populate_final_report(report_template, pdf_based_file_preprocessed_data, input_file, SERVER, DATABASE, USERNAME, PASSWORD)
-        
-        if len(input_file) > 0:
             
-            logging.info(f"{input_file}")
-            if 'Emirates-NBD-Classic-Luxury-Main' in input_file:
-                file_name_xl='Emirates-NBD-Classic-Luxury-Main'  
-                logging.info(f"{file_name_xl}")    
-            elif 'Rak-Bank-Classic-Luxury' in input_file:
-                file_name_xl='Rak-Bank-Classic-Luxury'
-                logging.info(f"{file_name_xl}")
-            elif 'CLT-ADCB' in input_file:
-                file_name_xl='CLT-ADCB'
-                logging.info(f"{file_name_xl}")
-            elif 'CBD-Bank' in input_file:
-                file_name_xl='CBD-Bank'
-                logging.info(f"{file_name_xl}")
-            elif 'EIB-Loan-account' in input_file:
-                file_name_xl='EIB-Loan-account'
-                logging.info(f"{file_name_xl}")
-            elif 'OLT-Emirates-Islamic-Bank' in input_file:
-                file_name_xl='OLT-Emirates-Islamic-Bank'
-                logging.info(f"{file_name_xl}")
-            elif re.search(r'_Emirates-NBD-Classic-Passenger_', input_file):
-                file_name_xl='Emirates-NBD-Classic-Passenger'
-                logging.info(f"{file_name_xl}")
-            elif 'ENBD-Classic-Riders' in input_file:
-                file_name_xl='ENBD-Classic-Riders'
-                logging.info(f"{file_name_xl}")
-            else: 
-                file_name_xl = "new_file"
-                logging.info(f'{input_file} Does not exist.')
-                logging.info(f"{file_name_xl}")
-        else: 
-            file_name_xl = "new_file"
-            logging.info(f'{input_file} Does not exist.')
-            logging.info(f"{file_name_xl}")
-            
-        excel_file_name = f"Report_for_{DATENOW.date()}_{DATENOW.month}_{DATENOW.day}_{DATENOW.hour}_{DATENOW.minute}_{DATENOW.second}_{file_name_xl}.xlsx"
+        excel_file_name = f"Report_for_{DATENOW.date()}_{DATENOW.month}_{DATENOW.day}_{DATENOW.hour}_{DATENOW.minute}_{DATENOW.second}_{input_file}.xlsx"
         logging.info(f"{excel_file_name}")
         save_dataframe_to_blob(populate_report_template,CONNECTIONSTRING, OUTPUTREPORTCONTIAINERNAME, excel_file_name)
 
@@ -510,17 +474,4 @@ def main(myblob: func.InputStream):
         logging.error(f"Invalid value: {e}")
 
     except Exception as e:
-        if str(e) == "'Emirates-NBD-Classic-Passenger'":
-            logging.error("Unexpected value for 'Emirates-NBD-Classic-Passenger'")
-            #excel_file_name = f"Report_for_{DATENOW.date()}_{DATENOW.month}_{DATENOW.day}_{DATENOW.hour}_{DATENOW.minute}_{DATENOW.second}_{file_name_xl}.xlsx"
-            #logging.info(f"{excel_file_name}")
-            #save_dataframe_to_blob(populate_report_template,CONNECTIONSTRING, OUTPUTREPORTCONTIAINERNAME, excel_file_name)
-
-        # Handle the specific error for 'Emirates-NBD-Classic-Passenger'
-        else:
-            logging.error(f"An unexpected error occurred: {e}")
-            excel_file_name = f"Report_for_{DATENOW.date()}_{DATENOW.month}_{DATENOW.day}_{DATENOW.hour}_{DATENOW.minute}_{DATENOW.second}_{file_name_xl}.xlsx"
-            logging.info(f"{excel_file_name}")
-            save_dataframe_to_blob(populate_report_template,CONNECTIONSTRING, OUTPUTREPORTCONTIAINERNAME, excel_file_name)
-
-        # Handle any other type of exception
+        logging.error(f"Invalid Exception: {e}")
