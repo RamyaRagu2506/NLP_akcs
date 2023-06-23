@@ -7,6 +7,7 @@ import pyodbc
 from datetime import datetime
 import pickle
 from io import BytesIO
+import re
 
 #Global Variables declared
 CLOSINGBALANCETABLENAME = os.environ["AkcsclosingbalanceTableName"]
@@ -483,7 +484,7 @@ def main(myblob: func.InputStream):
             elif 'OLT-Emirates-Islamic-Bank' in input_file:
                 file_name_xl='OLT-Emirates-Islamic-Bank'
                 logging.info(f"{file_name_xl}")
-            elif 'Emirates-NBD-Classic-Passenger' in input_file:
+            elif re.search(r'Emirates-NBD-Classic-Passenger', input_file):
                 file_name_xl='Emirates-NBD-Classic-Passenger'
                 logging.info(f"{file_name_xl}")
             elif 'ENBD-Classic-Riders' in input_file:
@@ -511,9 +512,9 @@ def main(myblob: func.InputStream):
     except Exception as e:
         if str(e) == "'Emirates-NBD-Classic-Passenger'":
             logging.error("Unexpected value for 'Emirates-NBD-Classic-Passenger'")
-            excel_file_name = f"Report_for_{DATENOW.date()}_{DATENOW.month}_{DATENOW.day}_{DATENOW.hour}_{DATENOW.minute}_{DATENOW.second}_{file_name_xl}.xlsx"
-            logging.info(f"{excel_file_name}")
-            save_dataframe_to_blob(populate_report_template,CONNECTIONSTRING, OUTPUTREPORTCONTIAINERNAME, excel_file_name)
+            #excel_file_name = f"Report_for_{DATENOW.date()}_{DATENOW.month}_{DATENOW.day}_{DATENOW.hour}_{DATENOW.minute}_{DATENOW.second}_{file_name_xl}.xlsx"
+            #logging.info(f"{excel_file_name}")
+            #save_dataframe_to_blob(populate_report_template,CONNECTIONSTRING, OUTPUTREPORTCONTIAINERNAME, excel_file_name)
 
         # Handle the specific error for 'Emirates-NBD-Classic-Passenger'
         else:
