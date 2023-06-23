@@ -484,7 +484,7 @@ def main(myblob: func.InputStream):
             elif 'OLT-Emirates-Islamic-Bank' in input_file:
                 file_name_xl='OLT-Emirates-Islamic-Bank'
                 logging.info(f"{file_name_xl}")
-            elif re.search(r'Emirates-NBD-Classic-Passenger', input_file):
+            elif re.search(r'_Emirates-NBD-Classic-Passenger_', input_file):
                 file_name_xl='Emirates-NBD-Classic-Passenger'
                 logging.info(f"{file_name_xl}")
             elif 'ENBD-Classic-Riders' in input_file:
@@ -524,4 +524,3 @@ def main(myblob: func.InputStream):
             save_dataframe_to_blob(populate_report_template,CONNECTIONSTRING, OUTPUTREPORTCONTIAINERNAME, excel_file_name)
 
         # Handle any other type of exception
-    
