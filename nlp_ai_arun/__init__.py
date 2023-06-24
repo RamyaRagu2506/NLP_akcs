@@ -8,6 +8,10 @@ from datetime import datetime
 import pickle
 from io import BytesIO
 import re
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
 
 #Global Variables declared
 CLOSINGBALANCETABLENAME = os.environ["AkcsclosingbalanceTableName"]
@@ -373,6 +377,31 @@ def save_dataframe_to_blob(dataframe, connection_string, container_name, excel_f
     
     blob_client.upload_blob(report_file, overwrite=True, content_settings=ContentSettings(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'))
 
+    #Send data as email:
+    attachment = report_file.getvalue()
+    
+    # Create a multipart message and set the email headers
+    message = MIMEMultipart()
+    message['From'] = "srinivas.muralidharan@deku.co.in"
+    message['To'] = "arunkumar@asdsandassociates.com"
+    message['Subject'] = f"Bank Statement report for {datetime.utcnow()}"
+    
+    part = MIMEBase('application', 'octet-stream')
+    part.set_payload(attachment)
+    encoders.encode_base64(part)
+    part.add_header('Content-Disposition', f'attachment; filename={excel_file_name}')
+    message.attach(part)
+    
+    # Connect to the SMTP server and send the email
+    with smtplib.SMTP(smtp_server, smtp_port) as server:
+        server.starttls()
+        server.login(smtp_username, smtp_password)
+        server.send_message(message)
+    
+    logging.info("Excel file saved as blob and email sent successfully.")
+
+    
+    
 def load_nlp_models(connection_string, data_frame):
     # Remove rows with null values in the 'Narration' column
     nlp_classified = data_frame.dropna(subset=['Narration'])
@@ -463,11 +492,44 @@ def main(myblob: func.InputStream):
         
         update_sql_table_for_classified(pdf_based_file_preprocessed_data, SERVER, DATABASE, USERNAME, PASSWORD, TRANSACTIONDETAILSTABLENAME)
         populate_report_template = populate_final_report(report_template, pdf_based_file_preprocessed_data, input_file, SERVER, DATABASE, USERNAME, PASSWORD)
+        
+        if len(input_file) > 0:
             
-        excel_file_name = f"Report_for_{DATENOW.date()}_{DATENOW.month}_{DATENOW.day}_{DATENOW.hour}_{DATENOW.minute}_{DATENOW.second}_{input_file}.xlsx"
+            logging.info(f"{input_file}")
+            if 'Emirates-NBD-Classic-Luxury-Main' in input_file:
+                file_name_xl='Emirates-NBD-Classic-Luxury-Main'  
+                logging.info(f"{file_name_xl}")    
+            elif 'Rak-Bank-Classic-Luxury' in input_file:
+                file_name_xl='Rak-Bank-Classic-Luxury'
+                logging.info(f"{file_name_xl}")
+            elif 'CLT-ADCB' in input_file:
+                file_name_xl='CLT-ADCB'
+                logging.info(f"{file_name_xl}")
+            elif 'CBD-Bank' in input_file:
+                file_name_xl='CBD-Bank'
+                logging.info(f"{file_name_xl}")
+            elif 'EIB-Loan-account' in input_file:
+                file_name_xl='EIB-Loan-account'
+                logging.info(f"{file_name_xl}")
+            elif 'OLT-Emirates-Islamic-Bank' in input_file:
+                file_name_xl='OLT-Emirates-Islamic-Bank'
+                logging.info(f"{file_name_xl}")
+            elif 'Emirates-NBD-Classic-Passenger' in input_file:
+                file_name_xl='Emirates-NBD-Classic-Passenger'
+                logging.info(f"{file_name_xl}")
+            elif 'ENBD-Classic-Riders' in input_file:
+                file_name_xl='ENBD-Classic-Riders'
+                logging.info(f"{file_name_xl}")
+            else: 
+                file_name_xl = "new_file"
+                logging.info(f'{input_file} Does not exist.')
+                logging.info(f"{file_name_xl}")
+        else: 
+            logging.info(f'{input_file} Does not exist.')
+            
+        excel_file_name = f"Report_for_{DATENOW.date()}_{DATENOW.month}_{DATENOW.day}_{DATENOW.hour}_{DATENOW.minute}_{DATENOW.second}_{file_name_xl}.xlsx"
         logging.info(f"{excel_file_name}")
         save_dataframe_to_blob(populate_report_template,CONNECTIONSTRING, OUTPUTREPORTCONTIAINERNAME, excel_file_name)
-
     except FileNotFoundError as e:
         logging.error(f"File not found: {e.filename}")
 
