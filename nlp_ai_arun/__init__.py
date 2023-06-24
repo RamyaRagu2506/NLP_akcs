@@ -378,27 +378,27 @@ def save_dataframe_to_blob(dataframe, connection_string, container_name, excel_f
     blob_client.upload_blob(report_file, overwrite=True, content_settings=ContentSettings(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'))
 
     #Send data as email:
-    attachment = report_file.getvalue()
+    # attachment = report_file.getvalue()
     
-    # Create a multipart message and set the email headers
-    message = MIMEMultipart()
-    message['From'] = "srinivas.muralidharan@deku.co.in"
-    message['To'] = "arunkumar@asdsandassociates.com"
-    message['Subject'] = f"Bank Statement report for {datetime.utcnow()}"
+    # # Create a multipart message and set the email headers
+    # message = MIMEMultipart()
+    # message['From'] = "srinivas.muralidharan@deku.co.in"
+    # message['To'] = "arunkumar@asdsandassociates.com"
+    # message['Subject'] = f"Bank Statement report for {datetime.utcnow()}"
     
-    part = MIMEBase('application', 'octet-stream')
-    part.set_payload(attachment)
-    encoders.encode_base64(part)
-    part.add_header('Content-Disposition', f'attachment; filename={excel_file_name}')
-    message.attach(part)
+    # part = MIMEBase('application', 'octet-stream')
+    # part.set_payload(attachment)
+    # encoders.encode_base64(part)
+    # part.add_header('Content-Disposition', f'attachment; filename={excel_file_name}')
+    # message.attach(part)
     
-    # Connect to the SMTP server and send the email
-    with smtplib.SMTP(smtp_server, smtp_port) as server:
-        server.starttls()
-        server.login(smtp_username, smtp_password)
-        server.send_message(message)
+    # # Connect to the SMTP server and send the email
+    # with smtplib.SMTP(smtp_server, smtp_port) as server:
+    #     server.starttls()
+    #     server.login(smtp_username, smtp_password)
+    #     server.send_message(message)
     
-    logging.info("Excel file saved as blob and email sent successfully.")
+    # logging.info("Excel file saved as blob and email sent successfully.")
 
     
     
