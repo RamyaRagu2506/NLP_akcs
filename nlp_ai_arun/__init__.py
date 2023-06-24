@@ -128,6 +128,7 @@ def populate_final_report(report_template, nlp_classified_df, input_file_path, s
     conn_str = f"DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password}"
     conn = pyodbc.connect(conn_str)
     openingBalance = list(nlp_classified_df['RunningBalance'])[0]
+    print(input_file_path)
     
     if 'Emirates-NBD-Classic-Luxury-Main' in input_file_path:
         logging.info(f"{len(nlp_classified_df)}")
@@ -288,7 +289,7 @@ def populate_final_report(report_template, nlp_classified_df, input_file_path, s
             report_template.loc[report_template['Description'] == description, 'Emirates NBD-Classic Passenger'] = total_sum
         report_template.loc[report_template['Description'] == 'Opening Balance', 'Emirates NBD-Classic Passenger'] = openingBalance
         closingBalance = report_template['Emirates NBD-Classic Passenger'][1:12].sum()
-        report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'Emirates NBD-Classic Passenger'] = report_template['Emirates-NBD-Classic-Passenger'][1:12].sum()
+        report_template.loc[report_template['Description'] == 'Closing Balance at the day end', 'Emirates NBD-Classic Passenger'] = report_template['Emirates NBD-Classic Passenger'][1:12].sum()
         cursor = conn.cursor()
         sql = f"INSERT INTO {CLOSINGBALANCETABLENAME} (ClosingBalanceDomainCompany, CreatedDate, ModifiedDate, ClosingBalance) " \
               f"VALUES (?, ?, ?, ?)"
